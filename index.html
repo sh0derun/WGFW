@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>WebGL Framework</title>
+        <style>
+            body{margin:0;}
+        </style>
+        <script src="wgl.js"></script>
+        <script>
+            window.onload = function(){
+                var gl = new WGL("#webglcanvas");
+                gl.setSize(window.innerWidth,window.innerHeight);
+                gl.clear();
+                gl.setClearColor({r:1.0,g:0.0,b:0.0,a:1.0});
+                gl.clear();
+                console.log(gl);
+            };
+        </script>
+    </head>
+    <body>
+        <canvas id="webglcanvas"></canvas>
+        <script id=vertex-shader type="x-shader/x-vertex" src="vertexshader.vs"></script>
+        <script id=fragment-shader type="x-shader/x-fragment" src="fragmentshader.vs"></script>
+    </body>
+</html>
