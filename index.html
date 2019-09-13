@@ -4,21 +4,51 @@
         <style>
             body{margin:0;}
         </style>
-        <script src="wgl.js"></script>
         <script>
             window.onload = function(){
                 var gl = new WGL("#webglcanvas");
                 gl.setSize(window.innerWidth,window.innerHeight);
                 gl.clear();
-                gl.setClearColor({r:1.0,g:0.0,b:0.0,a:1.0});
+                gl.setClearColor({r:1.0,g:0.0,b:0.0,a:0.3});
                 gl.clear();
                 console.log(gl);
+                
+                var shader = new Shader('./shaders/vertexshader.glsl','./shaders/fragmentshader.glsl');
+
+                console.log(shader);
+
+                shader.compileShaders(gl.ctx);
+                shader.initProgramShader(gl.ctx);
+                shader.initShaderValues(gl.ctx,gl.canvas);
+                console.log(shader.attribus);
+                gl.initBuffer(shader.attribus["a_position"].location);
+
+                window.requestAnimFrame = (function() {
+                  return window.requestAnimationFrame ||
+                         window.webkitRequestAnimationFrame ||
+                         window.mozRequestAnimationFrame ||
+                         window.oRequestAnimationFrame ||
+                         window.msRequestAnimationFrame ||
+                         function(callback,element) {
+                           return window.setTimeout(callback, 1000/60);
+                         };
+                })();
+
+                window.cancelRequestAnimFrame = (function() {
+                  return window.cancelCancelRequestAnimationFrame ||
+                         window.webkitCancelRequestAnimationFrame ||
+                         window.mozCancelRequestAnimationFrame ||
+                         window.oCancelRequestAnimationFrame ||
+                         window.msCancelRequestAnimationFrame ||
+                         window.clearTimeout;
+                })();
+
             };
         </script>
     </head>
     <body>
         <canvas id="webglcanvas"></canvas>
-        <script id=vertex-shader type="x-shader/x-vertex" src="vertexshader.vs"></script>
-        <script id=fragment-shader type="x-shader/x-fragment" src="fragmentshader.vs"></script>
+        <script src="wgl.js"></script>
+        <script src="shader.js"></script>
     </body>
 </html>

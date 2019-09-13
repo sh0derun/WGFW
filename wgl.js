@@ -22,4 +22,18 @@ class WGL{
         this.ctx.clearColor(c.r,c.g,c.b,c.a);
     }
 
+    initBuffers(positionLocation){
+        var buffer = this.ctx.createBuffer();
+        this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, buffer);
+        this.ctx.bufferData(this.ctx.ARRAY_BUFFER, new Float32Array([
+        -1.0, -1.0,
+         1.0, -1.0,
+        -1.0,  1.0,
+        -1.0,  1.0,
+         1.0, -1.0,
+         1.0,  1.0]), this.ctx.STATIC_DRAW);
+        this.ctx.enableVertexAttribArray(positionLocation);
+        this.ctx.vertexAttribPointer(positionLocation, 2, this.ctx.FLOAT, false, 0, 0);
+    }
+
 }
