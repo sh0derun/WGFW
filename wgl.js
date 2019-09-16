@@ -4,6 +4,8 @@ class WGL{
         this.ctx = this.canvas.getContext("webgl");
         if(!this.ctx){console.error("webgl context is not avaliable !"); return null;}
         this.ctx.clearColor(1.0,1.0,1.0,1.0);
+
+        this.ctx.getExtension('OES_standard_derivatives'); 
     }
 
     clear(){
@@ -34,7 +36,6 @@ class WGL{
          1.0,  1.0]), this.ctx.STATIC_DRAW);
         this.ctx.enableVertexAttribArray(positionLocation);
         this.ctx.vertexAttribPointer(positionLocation, 2, this.ctx.FLOAT, false, 0, 0);
-        this.ctx.drawArrays(this.ctx.TRIANGLES, 0, 6);
     }
 
 }

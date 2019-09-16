@@ -54,8 +54,6 @@ class Shader {
 
         if (!gl.getProgramParameter(this.programShader, gl.LINK_STATUS)) {
             console.log("WebGL - Shader Initialization Error");
-            document.getElementById('heading').innerHTML = "WebGL - Shader Initialization Error";
-            document.getElementById('info').innerHTML = "WebGL could not initialize one, or both, shaders.";
             gl.deleteProgram(this.programShader);
             return;
         }

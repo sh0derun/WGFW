@@ -30,13 +30,13 @@ class Animation {
     }
 
     render() {
+        console.log(this.gl.getUniform(this.shader.programShader, this.shader.uniforms.time.location));
 
         var elapsedtime = (Date.now() - this.start) / 1000.0;
         var framespeed = 1.0;
         this.shader.uniforms.time.value += framespeed * elapsedtime;
         this.gl.uniform1f(this.shader.uniforms.time.location, this.shader.uniforms.time.value);
 
-        //gl.clearColor(1.0, 0.0, 0.0, 1.0)
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 
         this.fps++;
@@ -48,6 +48,6 @@ class Animation {
 
         this.start = Date.now();
 
-        window.requestAnimationFrame(this.render);
+        window.requestAnimationFrame(this.render.bind(this));
     }
 }
