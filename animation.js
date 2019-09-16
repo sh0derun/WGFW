@@ -30,14 +30,11 @@ class Animation {
     }
 
     render() {
-        //console.log("from uniform = "+Math.sin(this.gl.getUniform(this.shader.programShader, this.shader.uniforms.time.location)));
-        //console.log("from js = "+Math.sin(this.shader.uniforms.time.value));
-
         var elapsedtime = (Date.now() - this.start) / 1000.0;
         var framespeed = 1.0;
-        var res = 0.01;//framespeed * elapsedtime;
+        var res = 0.01;
         console.log(res);
-        this.shader.uniforms.time.value += 0.01;//framespeed * elapsedtime;
+        this.shader.uniforms.time.value += 0.01;
         this.gl.uniform1f(this.shader.uniforms.time.location, this.shader.uniforms.time.value);
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);

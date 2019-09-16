@@ -12,7 +12,7 @@
                 gl.setClearColor({r:1.0,g:0.0,b:0.0,a:0.3});
                 gl.clear();
                 
-                var shader = new Shader('./shaders/vertexshader.glsl', './shaders/shadertemplate.glsl');//'./frag.glsl');//'./shaders/fragmentshader.glsl');
+                var shader = new Shader('./shaders/vertexshader.glsl', './shaders/shadertemplate.glsl');
 
                 shader.compileShaders(gl.ctx);
                 shader.initProgramShader(gl.ctx);
