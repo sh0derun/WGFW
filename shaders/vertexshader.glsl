@@ -1,5 +1,7 @@
-attribute vec2 a_position;
-varying vec2 surfacePosition;
+#version 300 es
+
+in vec2 a_position;
+vec2 surfacePosition;
 uniform vec2 screenRatio;
 
 void main() {

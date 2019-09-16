@@ -35,8 +35,10 @@ class Animation {
 
         var elapsedtime = (Date.now() - this.start) / 1000.0;
         var framespeed = 1.0;
-        this.shader.uniforms.time.value += framespeed * elapsedtime;
-        this.gl.uniform1f(this.shader.uniforms.time.location, Math.sin(3.0*this.shader.uniforms.time.value));
+        var res = 0.01;//framespeed * elapsedtime;
+        console.log(res);
+        this.shader.uniforms.time.value += 0.01;//framespeed * elapsedtime;
+        this.gl.uniform1f(this.shader.uniforms.time.location, this.shader.uniforms.time.value);
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 

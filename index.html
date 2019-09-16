@@ -11,16 +11,14 @@
                 gl.clear();
                 gl.setClearColor({r:1.0,g:0.0,b:0.0,a:0.3});
                 gl.clear();
-                console.log(gl);
                 
-                var shader = new Shader('./shaders/vertexshader.glsl','./shaders/fragmentshader.glsl');
+                var shader = new Shader('./shaders/vertexshader.glsl', './shaders/shadertemplate.glsl');//'./frag.glsl');//'./shaders/fragmentshader.glsl');
 
                 shader.compileShaders(gl.ctx);
                 shader.initProgramShader(gl.ctx);
                 shader.initShaderValues(gl.ctx,gl.canvas);
-                console.log(shader.uniforms);
-                console.log(shader.attributs);
-                console.log(shader.programShader);
+
+                ShaderUtil.combineShader("./shaders/shadertemplate.glsl");
                 
                 gl.initBuffers(shader.attributs.a_position.location);
 
@@ -33,6 +31,7 @@
     <body>
         <canvas id="webglcanvas"></canvas>
         <script src="wgl.js"></script>
+        <script src="shaderutil.js"></script>
         <script src="shader.js"></script>
         <script src="animation.js"></script>
     </body>

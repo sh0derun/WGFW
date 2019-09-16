@@ -1,27 +1,13 @@
 class Shader {
 
     constructor(vert, frag) {
-        this.vertexShaderSource = this.loadShader(vert);
-        this.fragShaderSource = this.loadShader(frag);
+        this.vertexShaderSource = ShaderUtil.loadShaderSource(vert);
+        this.fragShaderSource = ShaderUtil.combineShader(frag);
         this.vertexShader = null;
         this.fragmentShader = null;
         this.programShader = null;
         this.uniforms = {};
         this.attributs = {};
-    }
-
-    loadShader(fileLocation) {
-        const req = new XMLHttpRequest();
-        req.open('GET', fileLocation, false);
-        req.overrideMimeType('text/plain');
-        req.send();
-
-        if (req.status === 200) {
-            console.log("<%s> file loading succeded !", fileLocation);
-            return req.responseText;
-        } else {
-            console.log("<%s> file loading failed !", fileLocation);
-        }
     }
 
     compileShaders(gl) {

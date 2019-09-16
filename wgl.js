@@ -1,7 +1,7 @@
 class WGL{
     constructor(selector){
         this.canvas = document.querySelector(selector);
-        this.ctx = this.canvas.getContext("webgl");
+        this.ctx = this.canvas.getContext("webgl2");
         if(!this.ctx){console.error("webgl context is not avaliable !"); return null;}
         this.ctx.clearColor(1.0,1.0,1.0,1.0);
 
