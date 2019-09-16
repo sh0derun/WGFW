@@ -13,5 +13,17 @@ void main(void){
 	vec2 p = gl_FragCoord.xy / resolution*2.0-1.0;
 	p.x *= resolution.x / resolution.y;
 	float a = time * 0.5;
-	gl_FragColor = vec4(sin(time));
+
+	p.x += time*2.0;
+	p.y += cos(time*3.0)*0.7;
+
+	float r = 0.1;
+
+	float s = smoothstep(r+0.01,r,length(p));
+
+	vec3 col = vec3(1.0,0.6,0.35);
+
+	col *= s;
+
+	gl_FragColor = vec4(col,1.0);
 }
