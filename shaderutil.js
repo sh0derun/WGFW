@@ -1,18 +1,16 @@
 class ShaderUtil{
 	static combineShader(shader){
-		var source = ShaderUtil.loadShaderSource(shader);
-		var lines = source.split('\n');
-		for(var i = 0; i < lines.length; i++){
-			if(lines[i].startsWith('#include')){
-				var shaderType = lines[i].substring(lines[i].indexOf("<")+1,lines[i].indexOf(".glsl>"));
+		var source = ShaderUtil.loadShaderSource(shader).split('\n');
+		for(var i = 0; i < source.length; i++){
+			if(source[i].startsWith('#include')){
+				var shaderType = source[i].substring(source[i].indexOf("<")+1,source[i].indexOf(".glsl>"));
 				var res = ShaderUtil.loadShaderSource("./shaders/"+shaderType+".glsl");
 				if(res !== null){
-					lines[i] = '\n'+res+'\n';
+					source[i] = '\n'+res+'\n';
 				}
 			}
 		}
-		source = lines.join('');
-		return source;
+		return source.join('');
 	}
 
 	static loadShaderSource(shaderSourceLocation){
@@ -27,5 +25,9 @@ class ShaderUtil{
         } else {
             console.log("<%s> file loading failed !", shaderSourceLocation);
         }
+	}
+
+	static loadJSON(jsonLocation){
+		return JSON.parse(ShaderUtil.loadShaderSource(jsonLocation));
 	}
 }

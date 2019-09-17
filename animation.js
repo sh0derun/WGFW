@@ -6,7 +6,7 @@ class Animation {
         this.gl = gl;
         this.shader = shader;
 
-        this.guiData = {speed: 0.0};
+        this.guiData = {speed: 0.1};
         this.guiControls = new dat.GUI({name:'Animation Data'});
         this.guiControls.add(this.guiData, 'speed', 0.0, 5.0, 0.01).onChange(this.onChangeValue.bind(this));
     }
@@ -45,7 +45,7 @@ class Animation {
 
         console.log(this.guiData.speed);
 
-        var lerpFactor = 0.01;
+        var lerpFactor = 0.3;
         this.shader.uniforms.speed.value = (1 - lerpFactor) * this.shader.uniforms.speed.value + lerpFactor * this.guiData.speed;
         this.gl.uniform1f(this.shader.uniforms.speed.location, this.shader.uniforms.speed.value);
 

@@ -49,6 +49,12 @@ class Shader {
     }
 
     initShaderValues(gl, canvas) {
+        var shaderData = ShaderUtil.loadJSON("./shaders/shader_data/uniforms.json");
+
+        if(shaderData.uniforms){
+
+        }
+
         this.uniforms.time = {
             location: gl.getUniformLocation(this.programShader, "time"),
             value: 0.0
