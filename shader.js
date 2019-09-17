@@ -29,7 +29,9 @@ class Shader {
     }
 
     initProgramShader(gl) {
-        this.programShader = gl.createProgram();
+        if(this.programShader === null){
+            this.programShader = gl.createProgram();
+        }
 
         gl.attachShader(this.programShader, this.vertexShader);
         gl.attachShader(this.programShader, this.fragmentShader);
@@ -71,6 +73,12 @@ class Shader {
             }
         };
         gl.uniform2f(this.uniforms["screenRatio"].location, this.uniforms["screenRatio"].value.x, this.uniforms["screenRatio"].value.y);
+
+        this.uniforms.speed = {
+            location: gl.getUniformLocation(this.programShader, "speed"),
+            value: 0.0
+        };
+        gl.uniform1f(this.uniforms["speed"].location, this.uniforms["speed"].value);
 
         this.attributs.a_position = {
             location: gl.getAttribLocation(this.programShader, "a_position"),

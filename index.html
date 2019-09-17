@@ -6,7 +6,7 @@
         </style>
         <script>
             window.onload = function(){
-                var gl = new WGL("#webglcanvas");
+                var gl = new WGLW("#webglcanvas");
                 gl.setSize(window.innerWidth,window.innerHeight);
                 gl.clear();
                 gl.setClearColor({r:1.0,g:0.0,b:0.0,a:0.3});
@@ -17,8 +17,6 @@
                 shader.compileShaders(gl.ctx);
                 shader.initProgramShader(gl.ctx);
                 shader.initShaderValues(gl.ctx,gl.canvas);
-
-                ShaderUtil.combineShader("./shaders/shadertemplate.glsl");
                 
                 gl.initBuffers(shader.attributs.a_position.location);
 
@@ -30,9 +28,10 @@
     </head>
     <body>
         <canvas id="webglcanvas"></canvas>
-        <script src="wgl.js"></script>
+        <script src="wglw.js"></script>
         <script src="shaderutil.js"></script>
         <script src="shader.js"></script>
         <script src="animation.js"></script>
+        <script src="dat.gui.min.js"></script>
     </body>
 </html>

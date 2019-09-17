@@ -6,6 +6,7 @@ precision mediump float;
 
 uniform float time;
 uniform vec2 resolution;
+uniform float speed;
 
 out vec4 outColor;
 
@@ -20,7 +21,7 @@ void main( void )
     vec2 uv = gl_FragCoord.xy / resolution*2.0-1.0;
     uv.x *= resolution.x/resolution.y;
 	
-    float tm = time*2.0;
+    float tm = time*speed;
     
     vec3 camPos = vec3(4.0*cos(tm),2.0,4.0*sin(tm));
     vec3 camTar = vec3(0.0,0.0,0.0);

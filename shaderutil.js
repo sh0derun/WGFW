@@ -12,7 +12,6 @@ class ShaderUtil{
 			}
 		}
 		source = lines.join('');
-		console.log(source);
 		return source;
 	}
 
