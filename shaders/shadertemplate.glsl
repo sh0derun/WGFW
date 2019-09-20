@@ -7,6 +7,7 @@ precision mediump float;
 uniform float time;
 uniform vec2 resolution;
 uniform float speed;
+uniform float fogAmount;
 
 out vec4 outColor;
 
@@ -16,8 +17,7 @@ out vec4 outColor;
     
 #include<raymarch_prologue.glsl>
 
-void main( void )
-{
+void main( void ){
     vec2 uv = gl_FragCoord.xy / resolution*2.0-1.0;
     uv.x *= resolution.x/resolution.y;
 	
@@ -34,17 +34,15 @@ void main( void )
     
     vec2 t = march(camPos,d);
    
-    vec3 col = vec3(0.01)*d.y;
+    vec3 col = vec3(0.0)*d.y;
     
     
     if(t.x < 20.0){
-        //1.0	0.7	1.8
         PointLight lights[NUM_LIGHTS];
-
         lights[0] = PointLight(vec3(0.0,2.0,1.0),vec3(0.2,0.2,0.2),vec3(0.5,0.5,0.5),vec3(0.1,0.1,0.1),1.0,0.0014,0.000007);
         lights[1] = PointLight(vec3(5.0,3.0,-5.0),vec3(0.3,0.3,0.3),vec3(0.4,0.4,0.4),vec3(0.3,0.3,0.3),1.0,0.0014,0.000007);
         lights[2] = PointLight(vec3(4.0,4.0,3.0),vec3(0.1,0.1,0.1),vec3(0.8,0.8,0.8),vec3(0.6,0.6,0.6),1.0,0.0014,0.000007);
-        
+
         for(int i = 0; i < NUM_LIGHTS; i++){
             vec3 p = camPos+t.x*d;
             vec3 nr = normal(p);
@@ -64,7 +62,7 @@ void main( void )
                 float f = smoothstep(0.2,0.1,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
                 material = silver;
                 material.diffuse *= f;
-                material.shininess *= 64.0;
+                material.shininess *= 80.0;
             }
             else if(t.y == 2.0){
                 float f = smoothstep(0.2,0.1,sin(18.0*p.x)+sin(18.0*p.z));
@@ -77,7 +75,7 @@ void main( void )
             vec3 diffuse = lights[i].diffuse * (diff * material.diffuse) * softshadow(p,light_dir,0.01, 3.0, 32.0);
             
             //gamma correction
-            float gamma = 1.1;
+            float gamma = 1.4;
 			diffuse = pow(diffuse, vec3(gamma));
             
             if(true){
@@ -102,6 +100,9 @@ void main( void )
         }
         
     }
-    
+
+    vec3 skyCol = vec3(0.7, 0.8, 1.0);
+    col = mix(col, skyCol, sqrt(fogAmount*fogAmount)*smoothstep(0.,20.0,t.x));
+
     outColor = vec4(col,1.0);
 }

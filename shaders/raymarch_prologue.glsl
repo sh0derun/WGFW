@@ -27,7 +27,7 @@ float sminCubic( float a, float b, float k ){
 
 vec2 obj(vec3 p){
     p.y -= 0.5;
-    float r = 1.0-sin(p.y);
+    float r = 0.5;
     rotateZ(p,3.1415965/2.0);
     return vec2(sminCubic(fCylinder(p,0.2,1.3),sp(p,r),1.0),1.0);
 }

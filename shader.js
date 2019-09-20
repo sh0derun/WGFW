@@ -86,6 +86,12 @@ class Shader {
         };
         gl.uniform1f(this.uniforms["speed"].location, this.uniforms["speed"].value);
 
+        this.uniforms.fogAmount = {
+            location: gl.getUniformLocation(this.programShader, "fogAmount"),
+            value: 0.016
+        };
+        gl.uniform1f(this.uniforms["fogAmount"].location, this.uniforms["fogAmount"].value);
+
         this.attributs.a_position = {
             location: gl.getAttribLocation(this.programShader, "a_position"),
             value: 2

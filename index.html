@@ -20,14 +20,31 @@
                 
                 gl.initBuffers(shader.attributs.a_position.location);
 
-                var anim = new Animation(gl.ctx,shader);
+                var anim = new Animation(gl.ctx,shader,gl.canvas);
                 anim.initRenderingLoop();
                 anim.render();
+
+                function onInitFs(fs) {
+                   fs.root.getFile('tutorielsenfolie.txt', {create: true}, writeFile, function(e){console.log(e);});
+                }
+                function writeFile(fileEntry) {
+                   fileEntry.createWriter(function(fileWriter) {
+                      // On commence à la fin du fichier.
+                      fileWriter.seek(fileWriter.length);
+                      // On crée un objet Blob pour écrire dans le fichier.
+                      var data = new Blob(['Tutoriels en folie'], {type: 'text/plain'});
+                      fileWriter.write(data);
+                   }, function(e){console.log(e);});
+                }
+
+                window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+                window.requestFileSystem(window.TEMPORARY, 1024*1024, onInitFs, function(e){console.log(e);});
             };
         </script>
     </head>
     <body>
         <canvas id="webglcanvas"></canvas>
+        <img id="mirror"/>
         <script src="wglw.js"></script>
         <script src="shaderutil.js"></script>
         <script src="shader.js"></script>
