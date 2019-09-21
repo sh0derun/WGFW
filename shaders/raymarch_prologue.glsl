@@ -5,7 +5,7 @@ float sp(vec3 p, float s){
 }
 
 float pln(vec3 p){
-    float freq = 1.2;
+    float freq = 1.3;
     float ph = 0.19*(sin(freq*p.x)+sin(freq*p.z));
     return p.y + ph;
 }

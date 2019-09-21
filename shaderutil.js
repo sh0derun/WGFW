@@ -10,7 +10,7 @@ class ShaderUtil{
 				}
 			}
 		}
-		return source.join('');
+		return source.join('\n');
 	}
 
 	static loadShaderSource(shaderSourceLocation){
@@ -20,7 +20,7 @@ class ShaderUtil{
         req.send();
 
         if (req.status === 200) {
-            console.log("<%s> file loading succeded !", shaderSourceLocation);
+            //console.log("<%s> file loading succeded !", shaderSourceLocation);
             return req.responseText;
         } else {
             console.log("<%s> file loading failed !", shaderSourceLocation);

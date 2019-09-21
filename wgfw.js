@@ -1,4 +1,4 @@
-class WGLW{
+class WGFW{
     constructor(selector){
         this.canvas = document.querySelector(selector);
         this.ctx = this.canvas.getContext("webgl2");

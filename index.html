@@ -2,12 +2,13 @@
     <head>
         <title>WebGL Framework</title>
         <style>
-            body{margin:0;}
+            body{margin:2%; text-align: center;}
+
         </style>
         <script>
             window.onload = function(){
-                var gl = new WGLW("#webglcanvas");
-                gl.setSize(window.innerWidth,window.innerHeight);
+                var gl = new WGFW("#webglcanvas");
+                gl.setSize(window.innerWidth/2.7,window.innerHeight/1.2);
                 gl.clear();
                 gl.setClearColor({r:1.0,g:0.0,b:0.0,a:0.3});
                 gl.clear();
@@ -23,29 +24,12 @@
                 var anim = new Animation(gl.ctx,shader,gl.canvas);
                 anim.initRenderingLoop();
                 anim.render();
-
-                function onInitFs(fs) {
-                   fs.root.getFile('tutorielsenfolie.txt', {create: true}, writeFile, function(e){console.log(e);});
-                }
-                function writeFile(fileEntry) {
-                   fileEntry.createWriter(function(fileWriter) {
-                      // On commence à la fin du fichier.
-                      fileWriter.seek(fileWriter.length);
-                      // On crée un objet Blob pour écrire dans le fichier.
-                      var data = new Blob(['Tutoriels en folie'], {type: 'text/plain'});
-                      fileWriter.write(data);
-                   }, function(e){console.log(e);});
-                }
-
-                window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-                window.requestFileSystem(window.TEMPORARY, 1024*1024, onInitFs, function(e){console.log(e);});
             };
         </script>
     </head>
     <body>
         <canvas id="webglcanvas"></canvas>
-        <img id="mirror"/>
-        <script src="wglw.js"></script>
+        <script src="wgfw.js"></script>
         <script src="shaderutil.js"></script>
         <script src="shader.js"></script>
         <script src="animation.js"></script>

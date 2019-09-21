@@ -34,14 +34,14 @@ void main( void ){
     
     vec2 t = march(camPos,d);
    
-    vec3 col = vec3(0.0)*d.y;
+    vec3 col = vec3(0.0);
     
     
     if(t.x < 20.0){
         PointLight lights[NUM_LIGHTS];
-        lights[0] = PointLight(vec3(0.0,2.0,1.0),vec3(0.2,0.2,0.2),vec3(0.5,0.5,0.5),vec3(0.1,0.1,0.1),1.0,0.0014,0.000007);
-        lights[1] = PointLight(vec3(5.0,3.0,-5.0),vec3(0.3,0.3,0.3),vec3(0.4,0.4,0.4),vec3(0.3,0.3,0.3),1.0,0.0014,0.000007);
-        lights[2] = PointLight(vec3(4.0,4.0,3.0),vec3(0.1,0.1,0.1),vec3(0.8,0.8,0.8),vec3(0.6,0.6,0.6),1.0,0.0014,0.000007);
+        lights[0] = PointLight(vec3(0.0,4.0,3.0),vec3(0.2,0.2,0.2),vec3(0.5,0.5,0.5),vec3(0.1,0.1,0.1),1.0,0.0014,0.000007);
+        lights[1] = PointLight(vec3(0.0,4.0,-3.0),vec3(0.3,0.3,0.3),vec3(0.4,0.4,0.4),vec3(0.3,0.3,0.3),1.0,0.0014,0.000007);
+        lights[2] = PointLight(vec3(3.0,4.0,3.0),vec3(0.1,0.1,0.1),vec3(0.8,0.8,0.8),vec3(0.6,0.6,0.6),1.0,0.0014,0.000007);
 
         for(int i = 0; i < NUM_LIGHTS; i++){
             vec3 p = camPos+t.x*d;
@@ -60,13 +60,13 @@ void main( void ){
 
             if(t.y == 1.0){
                 float f = smoothstep(0.2,0.1,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
-                material = silver;
+                material = bronze;
                 material.diffuse *= f;
-                material.shininess *= 80.0;
+                material.shininess *= 100.0;
             }
             else if(t.y == 2.0){
-                float f = smoothstep(0.2,0.1,sin(18.0*p.x)+sin(18.0*p.z));
-                material = ruby;
+                float f = smoothstep(0.2,0.19,sin(18.0*p.x)+sin(18.0*p.z));
+                material = green_rubber;
                 material.diffuse *= f;
                 material.shininess *= 10.0;
             }
@@ -101,8 +101,8 @@ void main( void ){
         
     }
 
-    vec3 skyCol = vec3(0.7, 0.8, 1.0);
-    col = mix(col, skyCol, sqrt(fogAmount*fogAmount)*smoothstep(0.,20.0,t.x));
+    vec3 skyCol = vec3(0.7, 0.8, 1.0) - d.y;
+    col = mix(col, skyCol, fogAmount*smoothstep(0.,20.0,t.x));
 
     outColor = vec4(col,1.0);
 }
