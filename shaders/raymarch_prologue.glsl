@@ -5,7 +5,7 @@ float sp(vec3 p, float s){
 }
 
 float pln(vec3 p){
-    float freq = 1.3;
+    float freq = 1.1;
     float ph = 0.19*(sin(freq*p.x)+sin(freq*p.z));
     return p.y + ph;
 }
@@ -26,7 +26,7 @@ float sminCubic( float a, float b, float k ){
 }
 
 vec2 obj(vec3 p){
-    p.y -= 0.5;
+    p.y -= 1.0;
     float r = 0.5;
     rotateZ(p,3.1415965/2.0);
     return vec2(sminCubic(fCylinder(p,0.2,1.3),sp(p,r),1.0),1.0);

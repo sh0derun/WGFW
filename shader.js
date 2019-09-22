@@ -92,6 +92,27 @@ class Shader {
         };
         gl.uniform1f(this.uniforms["fogAmount"].location, this.uniforms["fogAmount"].value);
 
+        this.uniforms.fogColor = {
+            location: gl.getUniformLocation(this.programShader, "fogColor"),
+            value: [1.7, 0.8, 1.0]
+        };
+        console.log(this.uniforms.fogColor);
+        gl.uniform3fv(this.uniforms["fogColor"].location, this.uniforms["fogColor"].value);
+
+        this.uniforms.camera = {
+            location: gl.getUniformLocation(this.programShader, "camera"),
+            value: [1.0, 3.0, 1.0]
+        };
+        console.log(this.uniforms.camera);
+        gl.uniform3fv(this.uniforms["camera"].location, this.uniforms["camera"].value);
+
+        this.uniforms.gamma = {
+            location: gl.getUniformLocation(this.programShader, "gamma"),
+            value: 0.016
+        };
+        gl.uniform1f(this.uniforms["gamma"].location, this.uniforms["gamma"].value);
+
+        console.log("nice !!");
         this.attributs.a_position = {
             location: gl.getAttribLocation(this.programShader, "a_position"),
             value: 2

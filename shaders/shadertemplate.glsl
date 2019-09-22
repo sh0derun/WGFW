@@ -4,10 +4,7 @@
 precision mediump float;
 #endif
 
-uniform float time;
-uniform vec2 resolution;
-uniform float speed;
-uniform float fogAmount;
+#include<uniforms.glsl>
 
 out vec4 outColor;
 
@@ -23,7 +20,7 @@ void main( void ){
 	
     float tm = time*speed;
     
-    vec3 camPos = vec3(4.0*cos(tm),2.0,4.0*sin(tm));
+    vec3 camPos = vec3(camera.x,camera.y,camera.z);
     vec3 camTar = vec3(0.0,0.0,0.0);
     vec3 camDir = normalize(camTar - camPos);
     vec3 Up = vec3(0.0,1.0,0.0);
@@ -40,8 +37,8 @@ void main( void ){
     if(t.x < 20.0){
         PointLight lights[NUM_LIGHTS];
         lights[0] = PointLight(vec3(0.0,4.0,3.0),vec3(0.2,0.2,0.2),vec3(0.5,0.5,0.5),vec3(0.1,0.1,0.1),1.0,0.0014,0.000007);
-        lights[1] = PointLight(vec3(0.0,4.0,-3.0),vec3(0.3,0.3,0.3),vec3(0.4,0.4,0.4),vec3(0.3,0.3,0.3),1.0,0.0014,0.000007);
-        lights[2] = PointLight(vec3(3.0,4.0,3.0),vec3(0.1,0.1,0.1),vec3(0.8,0.8,0.8),vec3(0.6,0.6,0.6),1.0,0.0014,0.000007);
+        //lights[1] = PointLight(vec3(0.0,4.0,-3.0),vec3(0.3,0.3,0.3),vec3(0.4,0.4,0.4),vec3(0.3,0.3,0.3),1.0,0.0014,0.000007);
+        //lights[2] = PointLight(vec3(3.0,4.0,3.0),vec3(0.1,0.1,0.1),vec3(0.8,0.8,0.8),vec3(0.6,0.6,0.6),1.0,0.0014,0.000007);
 
         for(int i = 0; i < NUM_LIGHTS; i++){
             vec3 p = camPos+t.x*d;
@@ -74,8 +71,6 @@ void main( void ){
             vec3 ambient = lights[i].ambient * material.ambient;
             vec3 diffuse = lights[i].diffuse * (diff * material.diffuse) * softshadow(p,light_dir,0.01, 3.0, 32.0);
             
-            //gamma correction
-            float gamma = 1.4;
 			diffuse = pow(diffuse, vec3(gamma));
             
             if(true){
@@ -101,7 +96,7 @@ void main( void ){
         
     }
 
-    vec3 skyCol = vec3(0.7, 0.8, 1.0) - d.y;
+    vec3 skyCol = fogColor - d.y;
     col = mix(col, skyCol, fogAmount*smoothstep(0.,20.0,t.x));
 
     outColor = vec4(col,1.0);
