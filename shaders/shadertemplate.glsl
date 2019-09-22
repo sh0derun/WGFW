@@ -36,8 +36,8 @@ void main( void ){
     
     if(t.x < 20.0){
         PointLight lights[NUM_LIGHTS];
-        lights[0] = PointLight(vec3(0.0,4.0,3.0),vec3(0.2,0.2,0.2),vec3(0.5,0.5,0.5),vec3(0.1,0.1,0.1),1.0,0.0014,0.000007);
-        //lights[1] = PointLight(vec3(0.0,4.0,-3.0),vec3(0.3,0.3,0.3),vec3(0.4,0.4,0.4),vec3(0.3,0.3,0.3),1.0,0.0014,0.000007);
+        lights[0] = PointLight(vec3(2.0,2.0,0.0),vec3(0.4,0.4,0.4),vec3(0.5,0.5,0.5),vec3(0.2,0.2,0.2),1.0,0.0014,0.000007);
+        lights[1] = PointLight(vec3(0.0,5.0,-3.0),vec3(0.3,0.3,0.3),vec3(0.4,0.4,0.4),vec3(0.3,0.3,0.3),1.0,0.0014,0.000007);
         //lights[2] = PointLight(vec3(3.0,4.0,3.0),vec3(0.1,0.1,0.1),vec3(0.8,0.8,0.8),vec3(0.6,0.6,0.6),1.0,0.0014,0.000007);
 
         for(int i = 0; i < NUM_LIGHTS; i++){
@@ -61,15 +61,23 @@ void main( void ){
                 material.diffuse *= f;
                 material.shininess *= 100.0;
             }
+            else if(t.y == 3.0){
+                material = gold;
+                material.shininess = 120.0;
+            }
             else if(t.y == 2.0){
-                float f = smoothstep(0.2,0.19,sin(18.0*p.x)+sin(18.0*p.z));
+                material = green_rubber;
+                material.shininess *= 10.0;
+            }
+            else if(t.y == 4.0){
+                float f = smoothstep(0.2,0.1,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
                 material = green_rubber;
                 material.diffuse *= f;
                 material.shininess *= 10.0;
             }
             
             vec3 ambient = lights[i].ambient * material.ambient;
-            vec3 diffuse = lights[i].diffuse * (diff * material.diffuse) * softshadow(p,light_dir,0.01, 3.0, 32.0);
+            vec3 diffuse = lights[i].diffuse * (diff * material.diffuse) * softshadow(p,light_dir,0.01, 2.0, 32.0);
             
 			diffuse = pow(diffuse, vec3(gamma));
             

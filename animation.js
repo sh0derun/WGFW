@@ -11,7 +11,7 @@ class Animation {
             speed: 0.1,
             fogAmount: 0.016, 
             fogColor: [0.1,0,0], 
-            gamma: 0.016,
+            gamma: 0.8,
             pause: false,
             camera: {x:2.0, y:3.0, z:4.0},
             save:this.saveCanvasFile.bind(this)
@@ -30,7 +30,7 @@ class Animation {
         this.fogFolder.addColor(this.guiData, 'fogColor').onChange(this.onChangeFogColor.bind(this));
 
         this.fogFolder = this.guiControls.addFolder('Scene');
-        this.fogFolder.add(this.guiData, 'gamma', 0.0, 3.0, 0.0001).onChange(this.onChangeValue.bind(this));
+        this.fogFolder.add(this.guiData, 'gamma', 0.8, 2.0, 0.0001).onChange(this.onChangeValue.bind(this));
 
         this.guiControls.add(this.guiData, 'pause').onChange(this.onChangePauseFlag.bind(this));
         this.guiControls.add(this.guiData, 'save');
@@ -59,7 +59,7 @@ class Animation {
         var mapRange = function(from, to, s) {
             return to[0] + (s - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
         };
-        var newRangeColor = [];;
+        var newRangeColor = [];
         for(var i = 0; i < color.length; i++){
             newRangeColor[i] = mapRange([0,255], [0,1], color[i]);
         }
@@ -70,10 +70,10 @@ class Animation {
         return (1 - lerpFactor) * oldValue + lerpFactor * newValue;
     }
 
-    nlerp(oldValue, newValue, lerpFactor, lerp){
+    nlerp(oldValue, newValue, lerpFactor){
         var res = [];
         for(var i = 0; i < oldValue.length; i++){
-            res[i] = lerp(oldValue[i], newValue[i], lerpFactor);
+            res[i] = this.lerp(oldValue[i], newValue[i], lerpFactor);
         }
         return res;
     }
@@ -116,7 +116,7 @@ class Animation {
             this.shader.uniforms.gamma.value = this.lerp(this.shader.uniforms.gamma.value, this.guiData.gamma, 0.03);
             this.gl.uniform1f(this.shader.uniforms.gamma.location, this.shader.uniforms.gamma.value);
 
-            this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.03, this.lerp);
+            this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.03);
             this.gl.uniform3fv(this.shader.uniforms.camera.location, this.shader.uniforms.camera.value);
 
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);

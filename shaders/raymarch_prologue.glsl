@@ -1,5 +1,9 @@
 mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
 
+float vmax(vec3 v){return max(v.x,max(v.y,v.z));}
+
+float box(vec3 p, vec3 s){return vmax(abs(p)-s);}
+
 float sp(vec3 p, float s){
     return length(p)-s;
 }
@@ -7,7 +11,11 @@ float sp(vec3 p, float s){
 float pln(vec3 p){
     float freq = 1.1;
     float ph = 0.19*(sin(freq*p.x)+sin(freq*p.z));
-    return p.y + ph;
+    return p.y + ph + speed;
+}
+
+float ceiling(vec3 p){
+    return -p.y + 4.11;
 }
 
 float fCylinder(vec3 p, float r, float height) {
@@ -25,17 +33,36 @@ float sminCubic( float a, float b, float k ){
     return min( a, b ) - h*h*h*k*(1.0/6.0);
 }
 
-vec2 obj(vec3 p){
-    p.y -= 1.0;
+vec2 wierdObject(vec3 p){
     float r = 0.5;
-    rotateZ(p,3.1415965/2.0);
-    return vec2(sminCubic(fCylinder(p,0.2,1.3),sp(p,r),1.0),1.0);
+    rotateZ(p,PI/2.0);
+    return vec2(sminCubic(fCylinder(p-vec3(0.0,1.0,-3.0),0.2,1.3),sp(p-vec3(0.0,1.0,-3.0),r),1.0),1.0);
+}
+
+vec2 regularObject(vec3 p){
+    return vec2(box(p-vec3(0.0,1.0,1.5),vec3(0.5)),3.0);
+}
+
+vec2 sceneObjects(vec3 p){
+    vec2 obj1 = wierdObject(p);
+    vec2 obj2 = regularObject(p);
+    return (obj2.x < obj1.x) ? obj2 : obj1;
+}
+
+vec2 walls(vec3 p){
+    vec2 floor = vec2(pln(p),2.0);
+    vec2 ceiling = vec2(ceiling(p),2.0);
+    vec2 res = (floor.x < ceiling.x) ? floor : ceiling;
+    float dist = -(max(abs(p.x),abs(p.z))-9.0);
+    vec2 bounds = vec2(dist,4.0);
+    res = (res.x < bounds.x) ? res : bounds;
+    return res;
 }
 
 vec2 sdf(vec3 p){
-    vec2 a = obj(p);
-    vec2 b = vec2(pln(p),2.0);
-    return (b.x < a.x) ? b : a;
+    vec2 objects = sceneObjects(p);
+    vec2 resWalls = walls(p);
+    return (objects.x < resWalls.x) ? objects : resWalls;
 }
 
 vec2 march(vec3 o, vec3 d){

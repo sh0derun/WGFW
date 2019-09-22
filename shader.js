@@ -108,7 +108,7 @@ class Shader {
 
         this.uniforms.gamma = {
             location: gl.getUniformLocation(this.programShader, "gamma"),
-            value: 0.016
+            value: 0.8
         };
         gl.uniform1f(this.uniforms["gamma"].location, this.uniforms["gamma"].value);
 

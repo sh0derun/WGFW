@@ -1,1 +1,2 @@
-#define NUM_LIGHTS 1
+#define PI 3.141592653589793
+#define NUM_LIGHTS 2
