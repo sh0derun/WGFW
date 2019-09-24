@@ -21,16 +21,20 @@ void main( void ){
     float tm = time*speed;
     
     vec3 camPos = vec3(camera.x,camera.y,camera.z);
-    vec3 camTar = vec3(0.0,0.0,0.0);
+    vec3 camTar = vec3(mouse.x,mouse.y,0.0);
     vec3 camDir = normalize(camTar - camPos);
     vec3 Up = vec3(0.0,1.0,0.0);
     vec3 camRight = normalize(cross(camDir,Up));
     vec3 camUp = cross(camRight, camDir);
     
     vec3 d = normalize(uv.x*camRight + uv.y*camUp + 1.5*camDir);
-    
-    vec2 t = march(camPos,d);
-   
+    vec2 t = vec2(0.0);
+    if(!overRelaxation){
+        t = march(camPos,d);
+    }
+    else{
+        t = marchOverrelaxation(camPos, d, 0.001, 20.0, 0.001, true);
+    }
     vec3 col = vec3(0.0);
     
     if(t.x < 20.0){
@@ -46,8 +50,13 @@ void main( void ){
                 vec3 p = camPos+t.x*d;
                 vec3 nr = normal(p);
                 vec3 light_dir = normalize(lights[i].position - p);
-                float light_shadow = smoothstep(march(p+nr*0.001, light_dir).x,0.0,1.0);
-
+                float light_shadow = 0.0;
+                if(!overRelaxation){
+                    light_shadow = smoothstep(march(p+nr*0.001, light_dir).x,0.0,1.0);
+                }
+                else{
+                    light_shadow = smoothstep(marchOverrelaxation(p+nr*0.001, light_dir, 0.001, 20.0, 0.01, true).x,0.0,1.0);
+                }
                 float diff = clamp(dot(nr,light_dir),0.0,1.0);
 
                 vec3 viewDir = normalize(camPos - p);

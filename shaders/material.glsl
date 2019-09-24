@@ -5,6 +5,15 @@ struct Material {
     float shininess;
 };
 
+float combineSmooth(float d1, float d2, float r) {
+ 	float m = min(d1, d2);
+  	if (d1 < r && d2 < r) {
+    	return min(m, r - length(r - vec2(d1, d2)));
+  	} else {
+    	return m;
+  	}
+}
+
 Material emerald 	 	= Material(vec3(0.0215, 0.1745, 0.0215)      ,vec3(0.07568, 0.61424, 0.07568),		vec3(0.633, 0.727811, 0.633),			 0.6);
 Material jade			= Material(vec3(0.135, 0.2225, 0.1575)       ,vec3(0.54, 0.89, 0.63),				vec3(0.316228, 0.316228, 0.316228),		 0.1);
 Material obsidian		= Material(vec3(0.05375, 0.05, 0.06625)		 ,vec3(0.18275, 0.17, 0.22525),			vec3(0.332741, 0.328634, 0.346435),		 0.3);

@@ -10,15 +10,27 @@ class Animation {
         this.guiData = {
             speed: 0.1,
             fogAmount: 0.016, 
-            fogColor: [0.1,0,0], 
+            fogColor: [0.1,0,0],
+            mouse: [0.0,0.0,0.0],
             gamma: 0.8,
+            overRelaxation: false,
             pause: false,
             camera: {x:2.0, y:3.0, z:4.0},
             save:this.saveCanvasFile.bind(this)
         };
 
+        this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
+
+        document.addEventListener("keydown", event => {
+            if (event.isComposing || event.keyCode === 87) {
+                this.guiData.camera.z -= 0.1;
+                this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.03);
+                this.gl.uniform3fv(this.shader.uniforms.camera.location, this.shader.uniforms.camera.value);
+            }
+        });
+
         this.guiControls = new dat.GUI({name:'Animation Data'});
-        this.guiControls.add(this.guiData, 'speed', 0.0, 5.0, 0.01).onChange(this.onChangeValue.bind(this));
+        this.guiControls.add(this.guiData, 'speed', 0.0, 5.0, 0.01);
         
         this.cameraFolder = this.guiControls.addFolder('Camera');
         this.cameraFolder.add(this.guiData.camera,'x',-5.0,5.0,0.01);
@@ -26,11 +38,12 @@ class Animation {
         this.cameraFolder.add(this.guiData.camera,'z',-5.0,5.0,0.01);
         
         this.fogFolder = this.guiControls.addFolder('Fog');
-        this.fogFolder.add(this.guiData, 'fogAmount', 0.0, 2.5, 0.0001).onChange(this.onChangeValue.bind(this));
+        this.fogFolder.add(this.guiData, 'fogAmount', 0.0, 2.5, 0.0001);
         this.fogFolder.addColor(this.guiData, 'fogColor').onChange(this.onChangeFogColor.bind(this));
 
         this.fogFolder = this.guiControls.addFolder('Scene');
-        this.fogFolder.add(this.guiData, 'gamma', 0.8, 2.0, 0.0001).onChange(this.onChangeValue.bind(this));
+        this.fogFolder.add(this.guiData, 'gamma', 0.8, 2.0, 0.0001);
+        this.fogFolder.add(this.guiData, 'overRelaxation');
 
         this.guiControls.add(this.guiData, 'pause').onChange(this.onChangePauseFlag.bind(this));
         this.guiControls.add(this.guiData, 'save');
@@ -40,6 +53,12 @@ class Animation {
         if(!this.guiData.pause){
             this.render();
         }
+    }
+
+    onMouseMove(event){
+        this.guiData.mouse = [event.clientX, event.clientY];
+        this.shader.uniforms.mouse.value = this.mappingMouseCoords(this.guiData.mouse);
+        this.gl.uniform2fv(this.shader.uniforms.mouse.location, this.shader.uniforms.mouse.value);
     }
 
     onChangeFogColor(){
@@ -64,6 +83,17 @@ class Animation {
             newRangeColor[i] = mapRange([0,255], [0,1], color[i]);
         }
         return newRangeColor;
+    }
+
+    mappingMouseCoords(mouse){
+        var mapRange = function(from, to, s) {
+            return to[0] + (s - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
+        };
+        var newRangeMouse = [];
+        for(var i = 0; i < mouse.length; i++){
+            newRangeMouse[i] = mapRange([this.canvas.width,this.canvas.height], [-5,1], mouse[i]);
+        }
+        return newRangeMouse;
     }
 
     lerp(oldValue, newValue, lerpFactor){
@@ -115,6 +145,9 @@ class Animation {
 
             this.shader.uniforms.gamma.value = this.lerp(this.shader.uniforms.gamma.value, this.guiData.gamma, 0.03);
             this.gl.uniform1f(this.shader.uniforms.gamma.location, this.shader.uniforms.gamma.value);
+
+            this.shader.uniforms.overRelaxation.value = +this.guiData.overRelaxation;
+            this.gl.uniform1f(this.shader.uniforms.overRelaxation.location, this.shader.uniforms.overRelaxation.value);
 
             this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.03);
             this.gl.uniform3fv(this.shader.uniforms.camera.location, this.shader.uniforms.camera.value);

@@ -114,16 +114,17 @@ float softshadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k )
     return res;
 }
 
-float marchOverrelaxation(vec3 o, vec3 d, float t_min, float t_max, float pixelRadius, bool forceHit){
+vec2 marchOverrelaxation(vec3 o, vec3 d, float t_min, float t_max, float pixelRadius, bool forceHit){
     float omega = 1.2;
     float t = t_min;
-    float candidate_error = 999999.0;
-    float candidate_t = t_min;
+    float candidate_error = INFINITY;
+    vec2 candidate_t = vec2(t_min,0.0);
     float previousRadius = 0.0;
     float stepLength = 0.0;
     float functionSign = sdf(o).x < 0.0 ? -1.0 : +1.0;
     for (int i = 0; i < 80; ++i) {
-        float signedRadius = functionSign * sdf(d*t + o).x;
+        vec2 sdfResult = sdf(d*t + o);
+        float signedRadius = functionSign * sdfResult.x;
         float radius = abs(signedRadius);
         bool sorFail = omega > 1.0 && (radius + previousRadius) < stepLength;
         if (sorFail) {
@@ -136,13 +137,13 @@ float marchOverrelaxation(vec3 o, vec3 d, float t_min, float t_max, float pixelR
         previousRadius = radius;
         float error = radius / t;
         if (!sorFail && error < candidate_error) {
-            candidate_t = t;
+            candidate_t = vec2(t,sdfResult.y);
             candidate_error = error;
         }
         if (!sorFail && error < pixelRadius || t > t_max)
             break;
         t += stepLength;
     }
-    if ((t > t_max || candidate_error > pixelRadius) && !forceHit) return 999999.0;
-    return candidate_t;
+    //if ((t > t_max || candidate_error > pixelRadius) && !forceHit) return vec2(INFINITY,0.0);
+    if(t <= t_max && candidate_error <= pixelRadius)    return candidate_t;
 }

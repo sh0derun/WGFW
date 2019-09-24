@@ -106,11 +106,24 @@ class Shader {
         console.log(this.uniforms.camera);
         gl.uniform3fv(this.uniforms["camera"].location, this.uniforms["camera"].value);
 
+        this.uniforms.mouse = {
+            location: gl.getUniformLocation(this.programShader, "mouse"),
+            value: [1.0, 3.0]
+        };
+        console.log(this.uniforms.mouse);
+        gl.uniform2fv(this.uniforms["mouse"].location, this.uniforms["mouse"].value);
+
         this.uniforms.gamma = {
             location: gl.getUniformLocation(this.programShader, "gamma"),
             value: 0.8
         };
         gl.uniform1f(this.uniforms["gamma"].location, this.uniforms["gamma"].value);
+
+        this.uniforms.overRelaxation = {
+            location: gl.getUniformLocation(this.programShader, "overRelaxation"),
+            value: 0
+        };
+        gl.uniform1f(this.uniforms["overRelaxation"].location, this.uniforms["overRelaxation"].value);
 
         console.log("nice !!");
         this.attributs.a_position = {
