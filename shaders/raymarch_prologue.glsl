@@ -35,12 +35,16 @@ float sminCubic( float a, float b, float k ){
 
 vec2 wierdObject(vec3 p){
     float r = 0.5;
-    rotateZ(p,PI/2.0);
-    return vec2(sminCubic(fCylinder(p-vec3(0.0,1.0,-3.0),0.2,1.3),sp(p-vec3(0.0,1.0,-3.0),r),1.0),1.0);
+    vec2 res = vec2(sminCubic(fCylinder(p-vec3(0.0,1.0,-3.0),0.2,1.3),sp(p-vec3(0.0,1.0,-3.0),r),1.0),1.0);
+    float f = smoothstep(-0.4,0.4,sin(18.0*p.x)+sin(18.0*p.y)+sin(18.0*p.z));
+    res.x -= 0.02*f;
+    res.x *= 0.6;
+    return res;
 }
 
 vec2 regularObject(vec3 p){
-    return vec2(box(p-vec3(0.0,1.0,1.5),vec3(0.5)),3.0);
+    float f = smoothstep(-0.35,0.35,3.0*(sin(18.0*p.x)+sin(18.0*p.z)));
+    return vec2((box(p-vec3(0.0,1.0,1.5),vec3(0.5))-(0.012*f))*0.6,3.0);
 }
 
 vec2 sceneObjects(vec3 p){
@@ -54,6 +58,9 @@ vec2 walls(vec3 p){
     vec2 ceiling = vec2(ceiling(p),2.0);
     vec2 res = (floor.x < ceiling.x) ? floor : ceiling;
     float dist = -(max(abs(p.x),abs(p.z))-9.0);
+    float f = smoothstep(-0.5,0.5,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
+    dist -= 0.01*f*speed;
+    dist *= 0.6;
     vec2 bounds = vec2(dist,4.0);
     res = (res.x < bounds.x) ? res : bounds;
     return res;

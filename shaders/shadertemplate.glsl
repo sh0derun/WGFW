@@ -21,7 +21,7 @@ void main( void ){
     float tm = time*speed;
     
     vec3 camPos = vec3(camera.x,camera.y,camera.z);
-    vec3 camTar = vec3(mouse.x,mouse.y,0.0);
+    vec3 camTar = vec3(0.0,0.0,0.0);
     vec3 camDir = normalize(camTar - camPos);
     vec3 Up = vec3(0.0,1.0,0.0);
     vec3 camRight = normalize(cross(camDir,Up));
@@ -39,7 +39,7 @@ void main( void ){
     
     if(t.x < 20.0){
         PointLight lights[NUM_LIGHTS];
-        lights[0] = PointLight(vec3(2.0,2.0,0.0),vec3(0.4,0.4,0.4),vec3(0.5,0.5,0.5),vec3(0.2,0.2,0.2),1.0,0.0014,0.000007);
+        lights[0] = PointLight(vec3(2.0*cos(time),2.0,2.0*sin(time)),vec3(0.4,0.4,0.4),vec3(0.5,0.5,0.5),vec3(0.2,0.2,0.2),1.0,0.0014,0.000007);
         lights[1] = PointLight(vec3(0.0,5.0,-3.0),vec3(0.3,0.3,0.3),vec3(0.4,0.4,0.4),vec3(0.3,0.3,0.3),1.0,0.0014,0.000007);
         //lights[2] = PointLight(vec3(3.0,4.0,3.0),vec3(0.1,0.1,0.1),vec3(0.8,0.8,0.8),vec3(0.6,0.6,0.6),1.0,0.0014,0.000007);
 
@@ -67,7 +67,7 @@ void main( void ){
                 Material material;
 
                 if(t.y == 1.0){
-                    float f = smoothstep(0.2,0.1,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
+                    float f = smoothstep(-0.3,0.3,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
                     material = bronze;
                     material.diffuse *= f;
                     material.shininess *= 100.0;
@@ -81,7 +81,7 @@ void main( void ){
                     material.shininess *= 10.0;
                 }
                 else if(t.y == 4.0){
-                    float f = smoothstep(0.2,0.1,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
+                    float f = smoothstep(-0.5,0.5,sin(18.0*p.x)+sin(18.0*p.z)+pow(sin(18.0*p.y),2.0));
                     material = green_rubber;
                     material.diffuse *= f;
                     material.shininess *= 10.0;

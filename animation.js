@@ -22,8 +22,13 @@ class Animation {
         this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
 
         document.addEventListener("keydown", event => {
-            if (event.isComposing || event.keyCode === 87) {
+            if (event.isComposing || event.code === "KeyW") {
                 this.guiData.camera.z -= 0.1;
+                this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.03);
+                this.gl.uniform3fv(this.shader.uniforms.camera.location, this.shader.uniforms.camera.value);
+            }
+            if (event.isComposing || event.code === "KeyS") {
+                this.guiData.camera.z += 0.1;
                 this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.03);
                 this.gl.uniform3fv(this.shader.uniforms.camera.location, this.shader.uniforms.camera.value);
             }
