@@ -38,12 +38,13 @@ void main( void ){
     vec3 col = vec3(0.0);
     
     if(t.x < 20.0){
+        vec3 lipos = vec3(2.0*cos(time),1.0,2.0*sin(time));
         PointLight lights[NUM_LIGHTS];
-        lights[0] = PointLight(vec3(2.0*cos(time),2.0,2.0*sin(time)),vec3(0.4,0.4,0.4),vec3(0.5,0.5,0.5),vec3(0.2,0.2,0.2),1.0,0.0014,0.000007);
+        lights[0] = PointLight(lipos,vec3(0.4,0.4,0.4),vec3(0.5,0.5,0.5),vec3(0.2,0.2,0.2),1.0,0.0014,0.000007);
         lights[1] = PointLight(vec3(0.0,5.0,-3.0),vec3(0.3,0.3,0.3),vec3(0.4,0.4,0.4),vec3(0.3,0.3,0.3),1.0,0.0014,0.000007);
-        //lights[2] = PointLight(vec3(3.0,4.0,3.0),vec3(0.1,0.1,0.1),vec3(0.8,0.8,0.8),vec3(0.6,0.6,0.6),1.0,0.0014,0.000007);
+        lights[2] = PointLight(vec3(3.0,4.0,3.0),vec3(0.1,0.1,0.1),vec3(0.8,0.8,0.8),vec3(0.6,0.6,0.6),1.0,0.0014,0.000007);
 
-        DirLight dirlight = DirLight(vec3(cos(time),-1.0,sin(time)),vec3(0.4,0.4,0.4),vec3(1.0,1.0,1.0),vec3(0.2,0.2,0.2));
+        DirLight dirlight = DirLight(vec3(cos(time),-.5,sin(time)),vec3(0.4,0.4,0.4),vec3(1.0,1.0,1.0),vec3(0.2,0.2,0.2));
 
         if(true){
             for(int i = 0; i < NUM_LIGHTS; i++){
@@ -92,7 +93,7 @@ void main( void ){
                 
     			diffuse = pow(diffuse, vec3(gamma));
                 
-                if(true){
+                if(false){
                     vec3 halfwayDir = normalize(light_dir + viewDir);
                     spec = pow(max(dot(nr, halfwayDir), 0.0), material.shininess);
                 }

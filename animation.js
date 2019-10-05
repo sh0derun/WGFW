@@ -7,16 +7,20 @@ class Animation {
         this.shader = shader;
         this.canvas = canvas;
 
+        this.recorder = new Recorder("webglcanvas");
+
         this.guiData = {
             speed: 0.1,
             fogAmount: 0.016, 
             fogColor: [0.1,0,0],
             mouse: [0.0,0.0,0.0],
-            gamma: 0.8,
+            gamma: 1.3,
             overRelaxation: false,
+            showDisplacements: false,
             pause: false,
             camera: {x:2.0, y:3.0, z:4.0},
-            save:this.saveCanvasFile.bind(this)
+            save:this.saveCanvasFile.bind(this),
+            record:this.getRecordedAnimation.bind(this)
         };
 
         this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
@@ -49,14 +53,25 @@ class Animation {
         this.fogFolder = this.guiControls.addFolder('Scene');
         this.fogFolder.add(this.guiData, 'gamma', 0.8, 2.0, 0.0001);
         this.fogFolder.add(this.guiData, 'overRelaxation');
+        this.fogFolder.add(this.guiData, 'showDisplacements');
 
         this.guiControls.add(this.guiData, 'pause').onChange(this.onChangePauseFlag.bind(this));
         this.guiControls.add(this.guiData, 'save');
+        this.guiControls.add(this.guiData, 'record');
     }
 
     onChangePauseFlag(){
         if(!this.guiData.pause){
             this.render();
+        }
+    }
+
+    getRecordedAnimation(){
+        if(this.recorder.mediaRecorder.state === "inactive"){
+            this.recorder.mediaRecorder.start();
+        }
+        else{
+            this.recorder.mediaRecorder.stop();
         }
     }
 
@@ -148,11 +163,14 @@ class Animation {
             this.shader.uniforms.fogAmount.value = this.lerp(this.shader.uniforms.fogAmount.value, this.guiData.fogAmount, 0.03);
             this.gl.uniform1f(this.shader.uniforms.fogAmount.location, this.shader.uniforms.fogAmount.value);
 
-            this.shader.uniforms.gamma.value = this.lerp(this.shader.uniforms.gamma.value, this.guiData.gamma, 0.03);
+            this.shader.uniforms.gamma.value = this.lerp(this.shader.uniforms.gamma.value, this.guiData.gamma, 1.0);
             this.gl.uniform1f(this.shader.uniforms.gamma.location, this.shader.uniforms.gamma.value);
 
             this.shader.uniforms.overRelaxation.value = +this.guiData.overRelaxation;
             this.gl.uniform1f(this.shader.uniforms.overRelaxation.location, this.shader.uniforms.overRelaxation.value);
+
+            this.shader.uniforms.showDisplacements.value = +this.guiData.showDisplacements;
+            this.gl.uniform1f(this.shader.uniforms.showDisplacements.location, this.shader.uniforms.showDisplacements.value);
 
             this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.03);
             this.gl.uniform3fv(this.shader.uniforms.camera.location, this.shader.uniforms.camera.value);
@@ -160,6 +178,7 @@ class Animation {
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 
             this.fps++;
+
             this.fpstime += elapsedtime;
             if (this.fpstime >= 1.0) {
                 this.fpstime -= 1.0;
@@ -167,16 +186,6 @@ class Animation {
             }
 
             this.start = Date.now();
-
-            /*
-            var img_b64 = this.canvas.toDataURL('image/png');
-
-            fetch(img_b64).then(res => res.blob()).then(blob => {
-                blob.lastModifiedDate = new Date();
-                blob.name = "fileName"+this.shader.uniforms.time.value;
-                console.log(blob);
-            });
-            */
 
             window.requestAnimationFrame(this.render.bind(this));
         }

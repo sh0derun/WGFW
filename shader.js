@@ -49,11 +49,12 @@ class Shader {
     }
 
     initShaderValues(gl, canvas) {
-        var shaderData = ShaderUtil.loadJSON("./shaders/shader_data/uniforms.json");
 
-        if(shaderData.uniforms){
 
-        }
+
+        //var shaderData = ShaderUtil.loadJSON("./shaders/shader_data/uniforms.json");
+
+        var shaderData = ShaderUtil.parseShaderData(gl, this);
 
         this.uniforms.time = {
             location: gl.getUniformLocation(this.programShader, "time"),
@@ -115,7 +116,7 @@ class Shader {
 
         this.uniforms.gamma = {
             location: gl.getUniformLocation(this.programShader, "gamma"),
-            value: 0.8
+            value: 1.3
         };
         gl.uniform1f(this.uniforms["gamma"].location, this.uniforms["gamma"].value);
 
@@ -124,6 +125,12 @@ class Shader {
             value: 0
         };
         gl.uniform1f(this.uniforms["overRelaxation"].location, this.uniforms["overRelaxation"].value);
+
+        this.uniforms.showDisplacements = {
+            location: gl.getUniformLocation(this.programShader, "showDisplacements"),
+            value: 0
+        };
+        gl.uniform1f(this.uniforms["showDisplacements"].location, this.uniforms["showDisplacements"].value);
 
         console.log("nice !!");
         this.attributs.a_position = {

@@ -1,7 +1,16 @@
 {
-	"uniforms":{
-		"time": 0.0,
-		"resolution": {"x":600,"y":600},
-		"speed": 1.0
-	}
+  "uniforms": [
+    { "type": "float", "name": "time", "value": 0.0 },
+    { "type": "float", "name": "speed", "value": 0.0},
+    { "type": "float", "name": "fogAmount", "value": 0.0},
+    { "type": "float", "name": "gamma", "value": 1.4},
+    { "type": "vec2", "name": "resolution", "value": [600,500]},
+    { "type": "vec2", "name": "mouse", "value": [0,0]},
+    { "type": "vec3", "name": "fogColor", "value": [1.0,0.0,0.0]},
+    { "type": "vec3", "name": "camera", "value": [2,2,2]},
+    { "type": "bool", "name": "overRelaxation", "value": 1}
+  ],
+  "attributes": [
+    { "type": "vec2", "name": "a_position" }
+  ]
 }
