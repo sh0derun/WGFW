@@ -8,3 +8,5 @@ uniform float gamma;
 uniform bool overRelaxation;
 uniform bool showDisplacements;
 uniform vec2 mouse;
+uniform bool phongShading;
+uniform bool pbrShading;

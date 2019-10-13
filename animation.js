@@ -11,14 +11,16 @@ class Animation {
 
         this.guiData = {
             speed: 0.1,
-            fogAmount: 0.016, 
+            fogAmount: 0.0, 
             fogColor: [0.1,0,0],
             mouse: [0.0,0.0,0.0],
             gamma: 1.3,
             overRelaxation: false,
             showDisplacements: false,
+            phongShading: true,
+            pbrShading: false,
             pause: false,
-            camera: {x:2.0, y:3.0, z:4.0},
+            camera: {x:2.0, y:3.0, z:2.0},
             save:this.saveCanvasFile.bind(this),
             record:this.getRecordedAnimation.bind(this)
         };
@@ -51,9 +53,11 @@ class Animation {
         this.fogFolder.addColor(this.guiData, 'fogColor').onChange(this.onChangeFogColor.bind(this));
 
         this.fogFolder = this.guiControls.addFolder('Scene');
-        this.fogFolder.add(this.guiData, 'gamma', 0.8, 2.0, 0.0001);
+        this.fogFolder.add(this.guiData, 'gamma', 0.8, 5.0, 0.0001);
         this.fogFolder.add(this.guiData, 'overRelaxation');
         this.fogFolder.add(this.guiData, 'showDisplacements');
+        this.fogFolder.add(this.guiData, 'phongShading');
+        this.fogFolder.add(this.guiData, 'pbrShading');
 
         this.guiControls.add(this.guiData, 'pause').onChange(this.onChangePauseFlag.bind(this));
         this.guiControls.add(this.guiData, 'save');
@@ -151,13 +155,14 @@ class Animation {
     }
 
     render() {
+        //if(this.shader.uniforms.time.value > 0.01){this.guiData.pause=true;}
         if(!this.guiData.pause){
             var elapsedtime = (Date.now() - this.start) / 1000.0;
             var framespeed = 1.0;
             this.shader.uniforms.time.value += 0.01;
             this.gl.uniform1f(this.shader.uniforms.time.location, this.shader.uniforms.time.value);
 
-            this.shader.uniforms.speed.value = this.lerp(this.shader.uniforms.speed.value, this.guiData.speed, 0.03);
+            this.shader.uniforms.speed.value = this.lerp(this.shader.uniforms.speed.value, this.guiData.speed, 1.0);
             this.gl.uniform1f(this.shader.uniforms.speed.location, this.shader.uniforms.speed.value);
 
             this.shader.uniforms.fogAmount.value = this.lerp(this.shader.uniforms.fogAmount.value, this.guiData.fogAmount, 0.03);
@@ -172,7 +177,13 @@ class Animation {
             this.shader.uniforms.showDisplacements.value = +this.guiData.showDisplacements;
             this.gl.uniform1f(this.shader.uniforms.showDisplacements.location, this.shader.uniforms.showDisplacements.value);
 
-            this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.03);
+            this.shader.uniforms.phongShading.value = +this.guiData.phongShading;
+            this.gl.uniform1f(this.shader.uniforms.phongShading.location, this.shader.uniforms.phongShading.value);
+
+            this.shader.uniforms.pbrShading.value = +this.guiData.pbrShading;
+            this.gl.uniform1f(this.shader.uniforms.pbrShading.location, this.shader.uniforms.pbrShading.value);
+
+            this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.01);
             this.gl.uniform3fv(this.shader.uniforms.camera.location, this.shader.uniforms.camera.value);
 
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);

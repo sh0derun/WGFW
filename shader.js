@@ -89,7 +89,7 @@ class Shader {
 
         this.uniforms.fogAmount = {
             location: gl.getUniformLocation(this.programShader, "fogAmount"),
-            value: 0.016
+            value: 0.0
         };
         gl.uniform1f(this.uniforms["fogAmount"].location, this.uniforms["fogAmount"].value);
 
@@ -102,7 +102,7 @@ class Shader {
 
         this.uniforms.camera = {
             location: gl.getUniformLocation(this.programShader, "camera"),
-            value: [1.0, 3.0, 1.0]
+            value: [2.0, 3.0, 2.0]
         };
         console.log(this.uniforms.camera);
         gl.uniform3fv(this.uniforms["camera"].location, this.uniforms["camera"].value);
@@ -131,6 +131,19 @@ class Shader {
             value: 0
         };
         gl.uniform1f(this.uniforms["showDisplacements"].location, this.uniforms["showDisplacements"].value);
+
+        this.uniforms.phongShading = {
+            location: gl.getUniformLocation(this.programShader, "phongShading"),
+            value: 0
+        };
+        gl.uniform1f(this.uniforms["phongShading"].location, this.uniforms["phongShading"].value);
+
+        this.uniforms.pbrShading = {
+            location: gl.getUniformLocation(this.programShader, "pbrShading"),
+            value: 0
+        };
+
+        gl.uniform1f(this.uniforms["pbrShading"].location, this.uniforms["pbrShading"].value);
 
         console.log("nice !!");
         this.attributs.a_position = {
