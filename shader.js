@@ -102,10 +102,17 @@ class Shader {
 
         this.uniforms.camera = {
             location: gl.getUniformLocation(this.programShader, "camera"),
-            value: [2.0, 3.0, 2.0]
+            value: [4.0, 2.0, 4.0]
         };
         console.log(this.uniforms.camera);
         gl.uniform3fv(this.uniforms["camera"].location, this.uniforms["camera"].value);
+
+        this.uniforms.sphere = {
+            location: gl.getUniformLocation(this.programShader, "sphere"),
+            value: [0.5, 0.5, 0.1]
+        };
+        console.log(this.uniforms.sphere);
+        gl.uniform3fv(this.uniforms["sphere"].location, this.uniforms["sphere"].value);
 
         this.uniforms.mouse = {
             location: gl.getUniformLocation(this.programShader, "mouse"),
@@ -116,7 +123,7 @@ class Shader {
 
         this.uniforms.gamma = {
             location: gl.getUniformLocation(this.programShader, "gamma"),
-            value: 1.3
+            value: 0.8
         };
         gl.uniform1f(this.uniforms["gamma"].location, this.uniforms["gamma"].value);
 
@@ -142,8 +149,24 @@ class Shader {
             location: gl.getUniformLocation(this.programShader, "pbrShading"),
             value: 0
         };
-
         gl.uniform1f(this.uniforms["pbrShading"].location, this.uniforms["pbrShading"].value);
+//textureData.thickness
+//textureData.frequency
+        this.uniforms.textureData = {
+            location: {
+                thickness: gl.getUniformLocation(this.programShader, "textureData.thickness"),
+                frequency: gl.getUniformLocation(this.programShader, "textureData.frequency"),
+                amplitude: gl.getUniformLocation(this.programShader, "textureData.amplitude")
+            },
+            value: {
+                thickness: 0.1,
+                frequency: 0.1,
+                amplitude: 0.1
+            }
+        };
+        gl.uniform1f(this.uniforms["textureData"].location.thickness, this.uniforms["textureData"].value.thickness);
+        gl.uniform1f(this.uniforms["textureData"].location.frequency, this.uniforms["textureData"].value.frequency);
+        gl.uniform1f(this.uniforms["textureData"].location.amplitude, this.uniforms["textureData"].value.amplitude);
 
         console.log("nice !!");
         this.attributs.a_position = {

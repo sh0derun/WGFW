@@ -1,3 +1,5 @@
+#define saturate(x) (clamp((x), 0.0, 1.0))
+
 float hash (float st) {return fract(sin(st*12.9898)*43758.5453123);}
 float hash (vec2 st) {return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);}
 
@@ -79,6 +81,13 @@ vec2 wierdObject(vec3 p){
     return res;
 }
 
+float fHexagonCircumcircle(vec3 p, vec2 h) {
+    vec3 q = abs(p);
+    return max(q.y - h.y, max(q.x*sqrt(3.0)*0.5 + q.z*0.5, q.z) - h.x);
+    //this is mathematically equivalent to this line, but less efficient:
+    //return max(q.y - h.y, max(dot(vec2(cos(PI/3), sin(PI/3)), q.zx), q.z) - h.x);
+}
+
 vec2 regularObject(vec3 p){
     //p -= vec3(0.0,1.0,0.0);
     //rep3(p, vec3(speed));
@@ -93,6 +102,7 @@ vec2 regularObject(vec3 p){
     //vec2 res = vec2(sp(p-vec3(0.0,0.5,0.0), 0.5),3.0);
     vec2 sphere = vec2(sp(p-vec3(0.0,1.0,1.5), 1.0),3.0);
     vec2 cube = vec2(rbox(p-vec3(2.0,1.0,0.0), vec3(0.6), 0.15),5.0);
+    //vec2 hexa = vec2(fHexagonCircumcircle(p-vec3(2.0,1.0,0.0), vec2(0.6)), 5.0);
     vec2 res = cube.x < sphere.x ? cube : sphere;
 
     //vec2 res = vec2(box(p, vec3(0.9)),3.0);
@@ -113,11 +123,29 @@ vec2 sceneObjects(vec3 p){
     return (obj2.x < obj1.x) ? obj2 : obj1;
 }
 
+vec2 wallsZ(vec3 p){
+    vec2 res = vec2(-(abs(p.z)-9.0), 6.0);
+    return res;
+}
+
+vec2 wallsX(vec3 p){
+    return vec2(-(abs(p.x)-9.0), 4.0);
+}
+
 vec2 walls(vec3 p){
     vec2 floor = vec2(pln(p),2.0);
+    /*if(showDisplacements){
+        float freq = 15.0;
+        //float f = smoothstep(-speed,speed,abs(p.z+sin(p.x*textureData.frequency)*textureData.amplitude)-textureData.thickness);
+        //float f = smoothstep(-4.0,4.0,pow(noise(p.xy+sin(time))*5.0*sin(freq*p.x)*cos(p.z*freq)*sin(p.y*freq),2.0));
+        floor.x -= 0.05*f;
+        floor.x *= 0.6;
+    }*/
     vec2 ceiling = vec2(ceiling(p),0.0);
-    float dist = -(max(abs(p.x),abs(p.z))-9.0);
-    vec2 bounds = vec2(dist,4.0);
+    vec2 wallsx = wallsX(p);
+    vec2 wallsz = wallsZ(p);
+    //float dist = -(max(abs(p.x),abs(p.z))-9.0);
+    vec2 bounds = (wallsx.x < wallsz.x) ? wallsx : wallsz;
     vec2 res = (floor.x < bounds.x) ? floor : bounds;
     res = (res.x < ceiling.x) ? res : ceiling;
     return res;

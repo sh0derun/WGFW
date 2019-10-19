@@ -13,6 +13,21 @@ struct PBRMaterial {
 	vec3 emissive;
 };
 
+//vide 1
+//Air 1.000293
+//Helium  1.000036
+//Hydrogène 1.000132
+//Dioxyde de carbone  1.00045
+//Eau 1.333
+//Ethanol 1.36
+//Huile d'olive 1.47
+//Glace 1.309
+//Soda  1.46
+//PMMA (Plexiglas)  1.49
+//Verre crown (typique) 1.52
+//Verre flint (typique) 1.62
+//Diamant 2.42
+
 PBRMaterial simpleMatOrange = PBRMaterial(vec3(0.9,0.1,0.0),0.8,0.4,vec3(0.0));
 PBRMaterial simpleMatGreen = PBRMaterial(vec3(0.0,1.0,0.0),0.1,0.6,vec3(0.0));
 PBRMaterial simpleMatRed = PBRMaterial(vec3(1.0,0.0,0.0),0.6,0.1,vec3(0.0));
@@ -58,3 +73,12 @@ Material green_rubber	  = Material(vec3(0.0, 0.05, 0.0),			  vec3(0.4, 0.5, 0.4)
 Material red_rubber		  = Material(vec3(0.05, 0.0, 0.0),			  vec3(0.5, 0.4, 0.4),					vec3(0.7, 0.04, 0.04),					 0.078125, vec3(0.0));
 Material white_rubber	  = Material(vec3(0.05, 0.05, 0.05),			  vec3(0.5, 0.5, 0.5),					vec3(0.7, 0.7, 0.7),					 0.078125, vec3(0.0));
 Material yellow_rubber	= Material(vec3(0.05, 0.05, 0.0),			  vec3(0.5, 0.5, 0.4),					vec3(0.7, 0.7, 0.04),					 0.078125, vec3(0.0));
+
+
+Material mixMaterial(Material a, Material b, float x){
+  return Material(mix(a.ambient, b.ambient, x),
+             mix(a.diffuse, b.diffuse, x),
+             mix(a.specular, b.specular, x),
+             mix(a.shininess, b.shininess, x),
+             mix(a.emissive, b.emissive, x));
+}

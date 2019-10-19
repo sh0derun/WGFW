@@ -2,8 +2,13 @@
     <head>
         <title>WebGL Framework</title>
         <style>
-            body{margin:3%; text-align: center;background-color:black;}
-
+            body{
+                margin:0%;background-color:black;text-align: center;
+            }
+            canvas{margin-top: -3%; text-align: center;background-color:black;}
+            div#texgui{
+                margin:0%;
+            }
         </style>
         <script>
             window.onload = function(){
@@ -31,6 +36,7 @@
         </script>
     </head>
     <body>
+        <div id="texgui"></div>
         <canvas id="webglcanvas"></canvas>
         <script src="wgfw.js"></script>
         <script src="shaderutil.js"></script>
