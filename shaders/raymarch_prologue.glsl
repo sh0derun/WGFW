@@ -101,7 +101,12 @@ vec2 regularObject(vec3 p){
     // res.x = sminCubic(res.x,box(p, vec3(0.2,0.2,0.7)),0.5);
     //vec2 res = vec2(sp(p-vec3(0.0,0.5,0.0), 0.5),3.0);
     vec2 sphere = vec2(sp(p-vec3(0.0,1.0,1.5), 1.0),3.0);
-    vec2 cube = vec2(rbox(p-vec3(2.0,1.0,0.0), vec3(0.6), 0.15),5.0);
+    vec3 q = p-vec3(2.0,1.0,0.0);
+    float a = 1.2*sin(time*10.0);//PI/4.0;
+    q.x = (q.x*cos(a*q.y))-(q.x*sin(a*q.y));
+    q.z = (q.z*sin(a*q.y))+(q.z*cos(a*q.y));
+    q.y = q.y;
+    vec2 cube = vec2(box(q, vec3(0.6)),5.0);
     //vec2 hexa = vec2(fHexagonCircumcircle(p-vec3(2.0,1.0,0.0), vec2(0.6)), 5.0);
     vec2 res = cube.x < sphere.x ? cube : sphere;
 

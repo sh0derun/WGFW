@@ -1,0 +1,22 @@
+{
+  "name": "wgfw",
+  "version": "1.0.0",
+  "description": "only browsers that supports webgl2 can run this project",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razikanass/WGFW.git"
+  },
+  "keywords": [
+    "wgfw"
+  ],
+  "author": "sh@drun",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/razikanass/WGFW/issues"
+  },
+  "homepage": "https://github.com/razikanass/WGFW#readme"
+}
