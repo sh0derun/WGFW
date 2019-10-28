@@ -56,7 +56,7 @@ class Animation {
         this.texControls.add(this.textureData, 'amplitude', 0.01, 5.0, 0.01);
 
         this.guiControls = new dat.GUI({name:'Animation Data'});
-        this.guiControls.add(this.guiData, 'speed', 0.0, 5.0, 0.01);
+        this.guiControls.add(this.guiData, 'speed', -1.0, 5.0, 0.01);
         
         this.cameraFolder = this.guiControls.addFolder('Camera');
         this.cameraFolder.add(this.guiData.camera,'x',-5.0,5.0,0.01);
@@ -217,8 +217,6 @@ class Animation {
 
             this.shader.uniforms.textureData.value.amplitude = this.lerp(this.shader.uniforms.textureData.value.amplitude, this.textureData.amplitude, 1.0);
             this.gl.uniform1f(this.shader.uniforms.textureData.location.amplitude, this.shader.uniforms.textureData.value.amplitude);
-
-            console.log(this.shader.uniforms.sphere.value);
 
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 

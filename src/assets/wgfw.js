@@ -37,6 +37,5 @@ class WGFW{
         this.ctx.enableVertexAttribArray(positionLocation);
         this.ctx.vertexAttribPointer(positionLocation, 2, this.ctx.FLOAT, false, 0, 0);
     }
-
 }
 

@@ -12,7 +12,7 @@ out vec4 outColor;
 #include<material.glsl>
 #include<light.glsl>
 
-#include<raymarch_prologue.glsl>
+#include<raymarch_prologue_demo.glsl>
 
 int maxiter = 100;
 int reflectionCount = 1;
@@ -30,8 +30,8 @@ void main( void ){
     uv.x *= resolution.x/resolution.y;
 
     float tm = time;
-    O = vec3(camera.x*cos(tm),camera.y,camera.z*sin(tm))+1.5*sin(tm)*vec3(2.0*noise(tm*1.4),0.0,2.0*noise(tm*1.4));
-    Ot = vec3(camera.x*cos(tm),camera.y,camera.z*sin(tm))+1.5*sin(tm)*vec3(2.0*noise(tm*1.4),0.0,2.0*noise(tm*1.4));
+    O = vec3(0.0,0.0,-10.0)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),3.0*noise(tm*1.4),3.0*noise(tm*1.7));//vec3(camera.x*cos(tm*0.1)*speed,camera.y,camera.z*sin(tm*0.1)*speed)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),0.0,3.0*noise(tm*1.7));
+    Ot = vec3(camera.x*cos(tm),camera.y,camera.z*sin(tm))+1.5*sin(tm)*vec3(2.0*noise(tm*1.4),0.0,2.0*noise(tm*1.7));
     vec3 camTar = vec3(0.0,0.0,0.0);
     vec3 camDir = normalize(camTar - O);
     vec3 Up = vec3(0.0,1.0,0.0);
@@ -52,7 +52,7 @@ void main( void ){
     }
 
     if(t.x < 20.0){
-        if(t.y == 3.0){
+        if(t.y == 44.0){
             for(int i = 0; i < 2; i++){
                 vec3 t = march(O, D, maxiter);
                 P = O + D * t.x;
@@ -70,13 +70,14 @@ void main( void ){
         }
     }
 
-    vec3 skyCol = fogColor - D.y;
+    vec3 skyCol = fogColor;
     col = mix(col, skyCol, fogAmount*smoothstep(0.,20.0,t.x));
    
-    vec3 outputColor = col;
+    vec3 outputColor = vec3(1.0)-col;
 
     if(pbrShading){
         vec3 toneMappedColor = col/(col+1.0);
+        toneMappedColor -= vec3(1.0);
         outputColor = pow(toneMappedColor, vec3(1.0/gamma));
     }
 
@@ -90,14 +91,14 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
 
     vec3 lipos = vec3(2.0,3.0,2.0);
     PointLight lights[NUM_LIGHTS];
-    lights[0] = PointLight(vec3(-7.0,4.0,-7.0),vec3(1.0,0.0,0.0),vec3(1.0,0.1,0.2),vec3(0.2,0.2,0.2),attenuationLvl7);
-    lights[1] = PointLight(vec3(-7.0,4.0,7.0),vec3(0.0,1.0,0.0),vec3(0.2,0.5,0.9),vec3(0.3,0.3,0.3),attenuationLvl7);
-    lights[2] = PointLight(vec3(7.0,4.0,-7.0),vec3(0.0,0.0,1.0),vec3(0.9,0.2,0.1),vec3(0.6,0.6,0.6),attenuationLvl7);
-    lights[3] = PointLight(vec3(7.0,4.0,7.0),vec3(0.0,0.0,1.0),vec3(0.9,0.9,0.1),vec3(0.6,0.6,0.6),attenuationLvl7);
-    lights[4] = PointLight(vec3(-7.0,0.0,-7.0),vec3(1.0,0.0,0.0),vec3(0.2),vec3(0.2,0.2,0.2),attenuationLvl7);
-    lights[5] = PointLight(vec3(-7.0,0.0,7.0),vec3(0.0,1.0,0.0),vec3(0.5),vec3(0.3,0.3,0.3),attenuationLvl7);
-    lights[6] = PointLight(vec3(7.0,0.0,-7.0),vec3(0.0,0.0,1.0),vec3(0.1),vec3(0.6,0.6,0.6),attenuationLvl7);
-    lights[7] = PointLight(vec3(7.0,0.0,7.0),vec3(0.0,0.0,1.0),vec3(0.7),vec3(0.6,0.6,0.6),attenuationLvl7);
+    lights[0] = PointLight(vec3(-7.0,4.0,-7.0),vec3(1.0,0.0,0.0),vec3(1.0,0.1,0.2),vec3(0.2,0.2,0.2),attenuationLvl10);
+    lights[1] = PointLight(vec3(-7.0,4.0,7.0),vec3(0.0,1.0,0.0),vec3(0.2,0.5,0.9),vec3(0.3,0.3,0.3),attenuationLvl10);
+    lights[2] = PointLight(vec3(7.0,4.0,-7.0),vec3(0.0,0.0,1.0),vec3(0.9,0.2,0.1),vec3(0.6,0.6,0.6),attenuationLvl10);
+    lights[3] = PointLight(vec3(7.0,4.0,7.0),vec3(0.0,0.0,1.0),vec3(0.9,0.9,0.1),vec3(0.6,0.6,0.6),attenuationLvl10);
+    lights[4] = PointLight(vec3(-7.0,-4.0,-7.0),vec3(1.0,0.0,0.0),vec3(0.2),vec3(0.2,0.2,0.2),attenuationLvl10);
+    lights[5] = PointLight(vec3(-7.0,-4.0,7.0),vec3(0.0,1.0,0.0),vec3(0.5),vec3(0.3,0.3,0.3),attenuationLvl10);
+    lights[6] = PointLight(vec3(7.0,-4.0,-7.0),vec3(0.0,0.0,1.0),vec3(0.1),vec3(0.6,0.6,0.6),attenuationLvl10);
+    lights[7] = PointLight(vec3(7.0,-4.0,7.0),vec3(0.0,0.0,1.0),vec3(0.7),vec3(0.6,0.6,0.6),attenuationLvl10);
 
     DirLight dirlight = DirLight(vec3(cos(time),-.5,sin(time)),vec3(0.4,0.4,0.4),vec3(1.0,1.0,1.0),vec3(0.2,0.2,0.2));
 
@@ -124,53 +125,21 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
                                 
                 if(phongShading){
                     Material material;
-                    if(t.y == 0.0){
-                        material = yellow_rubber;
-                        material.shininess *= 10.0;
-                        material.emissive = vec3(0.001);
-                    }
-                    else if(t.y == 1.0){
+                    if(t.y < 1.5){
                         float f = smoothstep(-0.3,0.3,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
                         material = bronze;
                         material.diffuse *= f;
                         material.shininess *= 100.0;
                     }
-                    else if(t.y == 3.0){
-                        material = gold;
-                        material.shininess = 120.0;
+                    else if(t.y < 2.5){
+                        material = red_rubber;
+                        material.shininess *= 30.0;
                     }
-                    else if(t.y == 2.0){
-                        material = green_rubber;
-                        material.shininess *= 50.0;
-                    }
-                    else if(t.y == 4.0){
-                        //float f = smoothstep(-0.5,0.5,sin(18.0*p.z)*cos(18.0*p.y)+cos(18.0*p.x));
-                        //float f = smoothstep(-0.3,0.3,abs(sin(5.0*textureData.frequency*p.x)*sin(5.0*textureData.frequency*p.z)*sin(5.0*textureData.frequency*p.y)));
-                        float f = step(0.0,abs((p.y-2.0)+sin(p.z*textureData.frequency)*textureData.amplitude)-textureData.thickness);
-                        //float f = step(0.0,abs((-p.y+2.0)+sqrt(abs(sin(p.x*textureData.frequency)*textureData.amplitude)))-textureData.thickness);
-                        Material material1 = white_rubber;
-                        Material material2 = red_plastic;
-                        material = mixMaterial(material1, material2, f);
-                        material.shininess *= 32.0;
-                    }
-                    else if(t.y == 6.0){
-                        //float f = smoothstep(-0.5,0.5,sin(18.0*p.z)*cos(18.0*p.y)+cos(18.0*p.x));
-                        //float f = smoothstep(-0.3,0.3,abs(sin(5.0*textureData.frequency*p.x)*sin(5.0*textureData.frequency*p.z)*sin(5.0*textureData.frequency*p.y)));
-                        float f = step(0.0,abs((p.y-2.0)+sin(p.x*textureData.frequency)*textureData.amplitude)-textureData.thickness);
-                        //float f = step(0.0,abs((-p.y+2.0)+sqrt(abs(sin(p.x*textureData.frequency)*textureData.amplitude)))-textureData.thickness);
-                        Material material1 = red_plastic;
-                        Material material2 = white_rubber;
-                        Material wallMaterial = mixMaterial(material1, material2, f);
-                        wallMaterial.shininess *= 32.0;
-
-                        Material WallBarriers = Material(vec3(0.0), vec3(0.0), vec3(0.0), 0.0, vec3(0.0));
-                        float amount = saturate(pow(sin(p.x)*0.5+0.5,100.0));
-
-                        material = mixMaterial(wallMaterial, WallBarriers, amount);
-                    }
-                    else if(t.y == 5.0){
-                        material = turquoise;
-                        material.shininess *= 100.0;
+                    else{//if(t.y < 3.5)
+                        //float f = smoothstep(-0.3,0.3,sin(5.0*p.x)+sin(5.0*p.z)+sin(5.0*p.y));
+                        material = cyan_plastic;
+                        //material.diffuse *= f;
+                        material.shininess *= 80.0;
                     }
 
                     vec3 ambient = lights[i].ambient * material.ambient;
@@ -202,33 +171,18 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
                 }
                 else if(pbrShading){
                     PBRMaterial material;
-                    if(t.y == 0.0){
-                        material = simpleMatGray;
-                        material.emissive = pow((sin(2.0*p.x+5.0)*0.5+0.5),16.0)*vec3(0.3);
-                    }
-                    else if(t.y == 1.0){
-                        PBRMaterial simpleMatNoisy = mixPBRMterial(simpleMatRed, simpleMatWhite, smoothstep(-0.3,0.3,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y)));
+
+                    if(t.y < 1.5){
+                        PBRMaterial simpleMatNoisy = mixPBRMterial(simpleMatRed, simpleMatWhite, smoothstep(-0.3,0.3,sin(18.0*p.x)*sin(18.0*p.z)*sin(18.0*p.y)));
                         material = simpleMatNoisy;
                     }
-                    else if(t.y == 3.0){
+                    else if(t.y < 2.5){
                         material = simpleMatOrange;
-                        material.metalic = clamp(sphere.x*material.metalic,0.1,1.0);
-                        material.roughness = clamp(sphere.y*material.roughness,0.1,1.0);
-                        //p.y += sin(p.x);
-                        //vec2 coords = p.xy;
-                        //coords.y = abs(coords.y);
-                        //material.emissive = pow((sin(20.0*p.y+time*10.0)*0.5+0.5),8.0)*vec3(0.,0.15,0.02);
                     }
-                    else if(t.y == 2.0){
-                        material = simpleMatGreen;
-                    }   
-                    else if(t.y == 4.0){
-                        material = simpleMatGreen;
-                    }
-                    else if(t.y == 5.0){
+                    else{//if(t.y < 3.5)
+                        //float f = smoothstep(-0.3,0.3,sin(5.0*p.x)+sin(5.0*p.z)+sin(5.0*p.y));
                         material = simpleMatRed;
-                        //material.metalic = clamp(speed*material.metalic,0.1,1.0);
-                        //material.roughness = clamp(speed*material.roughness,0.1,1.0);
+                        //material.diffuse *= f;
                     }
 
                     vec3 F0 = vec3(0.02, 0.02, 0.02);
@@ -239,7 +193,7 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
                     vec3 H = normalize(viewDir + L);
                     float distance    = length(lights[i].position - p);
                     float attenuation = 1.0 / (distance * distance);
-                    vec3 radiance     = lights[i].diffuse * attenuation;        
+                    vec3 radiance     = lights[i].diffuse;// * attenuation;        
                     
                     // cook-torrance brdf
                     float NDF = DistributionGGX(nr, H, material.roughness);
@@ -270,25 +224,11 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
 
         Material material;
 
-        if(t.y == 1.0){
+        if(t.y < 1.5){
             float f = smoothstep(0.2,0.1,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
             material = bronze;
             material.diffuse *= f;
             material.shininess *= 100.0;
-        }
-        else if(t.y == 3.0){
-            material = gold;
-            material.shininess = 120.0;
-        }
-        else if(t.y == 2.0){
-            material = green_rubber;
-            material.shininess *= 10.0;
-        }
-        else if(t.y == 4.0){
-            float f = smoothstep(0.2,0.1,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
-            material = green_rubber;
-            material.diffuse *= f;
-            material.shininess *= 10.0;
         }
 
         vec3 lightDir = normalize(-dirlight.direction);
