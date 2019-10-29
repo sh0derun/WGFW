@@ -126,16 +126,27 @@ vec2 sdf(vec3 p){
     //pMod2(p.xz, vec2(1.5));
     //vec2 cube = vec2(box(p, vec3(0.5)),1.0);
     //return cube;
+
+    //float plane1 = dot(vec3(p.x,p.y,p.z)*rotateX(0.5*time)*rotateZ(0.5*time)*rotateY(0.5*time), normalize(vec3(1.0,1.0,1.0)))+1.0;
+    //float plane2 = dot(p*rotateX(2.0*time+1.17)*rotateY(2.0*time+1.17), normalize(vec3(1.0,0.0,1.0)))+1.0;
+    //float plane3 = dot(p*rotateZ(2.0*time+2.34)*rotateY(2.0*time+2.34), normalize(vec3(0.0,1.0,0.0)))+1.0;
+
+    float torus1 = torus(p*rotateX(0.5*time)*rotateZ(0.5*time)*rotateY(0.5*time),3.0,1.0);
+    torus1 = abs(torus1)-0.05;
+
     vec2 c = vec2(pModInterval1(p.x, 1.5, -2.0, 2.0),
                   pModInterval1(p.z, 1.5, -2.0, 2.0));
 
     //vec2 cube = vec2(box(p-vec3(0.0,speed,0.0), vec3((sin(time+c.x*c.y)*0.5+0.5)*0.5)),1.0);
-    vec2 sphereLayer1 = vec2(sp(p-vec3(0.0,3.0,0.0), (sin(3.0*time+c.x*c.y+3.0)*0.5+0.5)*0.5),1.0);
+    vec2 sphereLayer1 = vec2(sp(p-vec3(0.0,3.0,0.0), /*(sin(3.0*time+c.x*c.y+3.0)*0.5+0.5)*0.5)*/0.5),1.0);
+    sphereLayer1.x = abs(sphereLayer1.x)-0.01;
     vec2 sphereLayer2 = vec2(sp(p-vec3(0.0,0.0,0.0), /*(sin(3.0*time+c.x*c.y+1.5)*0.5+0.5)*0.5)*/0.5),2.0);
+    sphereLayer2.x = abs(sphereLayer2.x)-0.03;
     vec2 sphereLayer3 = vec2(sp(p-vec3(0.0,-3.0,0.0), /*(sin(3.0*time+c.x*c.y)*0.5+0.5)*0.5)*/0.5),3.0);
+    sphereLayer3.x = abs(sphereLayer3.x)-0.06;
     
     if(showDisplacements){
-        float f = smoothstep(-0.4,0.4,sin(18.0*p.x)*sin(18.0*p.y));
+        float f = smoothstep(-0.4,0.4,sin(18.0*p.x)*sin(18.0*p.y)*noise(p.xy)*speed);
         sphereLayer2.x -= 0.02*f;
         sphereLayer2.x *= 0.6;
         f = smoothstep(-0.4,0.4,sin(18.0*p.x)+sin(18.0*p.y));
@@ -144,7 +155,12 @@ vec2 sdf(vec3 p){
     }
 
     vec2 resLayer = sphereLayer1.x < sphereLayer2.x ? sphereLayer1 : sphereLayer2;
-    return resLayer.x < sphereLayer3.x ? resLayer : sphereLayer3;
+    resLayer = resLayer.x < sphereLayer3.x ? resLayer : sphereLayer3;
+
+    float planes = torus1;
+    resLayer.x = max(planes, resLayer.x);
+
+    return resLayer;
 }
 
 vec3 march(vec3 o, vec3 d, int maxIteration){

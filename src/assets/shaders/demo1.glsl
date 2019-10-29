@@ -30,14 +30,14 @@ void main( void ){
     uv.x *= resolution.x/resolution.y;
 
     float tm = time;
-    O = vec3(0.0,0.0,-10.0)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),3.0*noise(tm*1.4),3.0*noise(tm*1.7));//vec3(camera.x*cos(tm*0.1)*speed,camera.y,camera.z*sin(tm*0.1)*speed)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),0.0,3.0*noise(tm*1.7));
+    O = vec3(0.0,0.0,-10.0);//+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),3.0*noise(tm*1.4),3.0*noise(tm*1.7));//vec3(camera.x*cos(tm*0.1)*speed,camera.y,camera.z*sin(tm*0.1)*speed)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),0.0,3.0*noise(tm*1.7));
     Ot = vec3(camera.x*cos(tm),camera.y,camera.z*sin(tm))+1.5*sin(tm)*vec3(2.0*noise(tm*1.4),0.0,2.0*noise(tm*1.7));
     vec3 camTar = vec3(0.0,0.0,0.0);
     vec3 camDir = normalize(camTar - O);
     vec3 Up = vec3(0.0,1.0,0.0);
     vec3 camRight = normalize(cross(camDir,Up));
     vec3 camUp = cross(camRight, camDir);
-            
+    
     D = normalize(uv.x*camRight + uv.y*camUp + 1.5*camDir);
     Dt = normalize(uv.x*camRight + uv.y*camUp + 1.5*camDir);
 
@@ -72,13 +72,28 @@ void main( void ){
 
     vec3 skyCol = fogColor;
     col = mix(col, skyCol, fogAmount*smoothstep(0.,20.0,t.x));
-   
-    vec3 outputColor = vec3(1.0)-col;
+
+    vec3 outputColor = col;
+
+    //negatif
+    //vec3 outputColor = vec3(1.0)-col;
+
+    //brightness
+    //vec3 outputColor = vec3((col.r+col.g+col.b)/3.0);
+
+    /*vec3 c = vec3(0.0);
+
+    for(float k = 0.15; k < 1.0; k+=0.15){
+        c.rgb += circle(uv+0.5, k);
+    }
+    
+    outputColor *= c;*/
 
     if(pbrShading){
         vec3 toneMappedColor = col/(col+1.0);
-        toneMappedColor -= vec3(1.0);
         outputColor = pow(toneMappedColor, vec3(1.0/gamma));
+        //outputColor = vec3(1.0) - outputColor;
+        //outputColor = vec3((outputColor.r+outputColor.g+outputColor.b)/3.0);
     }
 
     outColor = vec4(outputColor,1.0);
