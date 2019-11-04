@@ -1,18 +1,20 @@
 #define saturate(x) (clamp((x), 0.0, 1.0))
 
-float hash (float st) {return fract(sin(st*12.9898)*43758.5453123);}
-float hash (vec2 st) {return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);}
+float hash(float p) { p = fract(p * 0.011); p *= p + 7.5; p *= p + p; return fract(p); }
+float hash(vec2 p) {vec3 p3 = fract(vec3(p.xyx) * 0.13); p3 += dot(p3, p3.yzx + 3.333); return fract((p3.x + p3.y) * p3.z); }
+float noise(float x) { float i = floor(x); float f = fract(x); float u = f * f * (3.0 - 2.0 * f); return mix(hash(i), hash(i + 1.0), u); }
+float noise(vec2 x) { vec2 i = floor(x); vec2 f = fract(x); float a = hash(i); float b = hash(i + vec2(1.0, 0.0)); float c = hash(i + vec2(0.0, 1.0)); float d = hash(i + vec2(1.0, 1.0)); vec2 u = f * f * (3.0 - 2.0 * f); return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y; }
+float noise(vec3 x) { const vec3 step = vec3(110.0, 241.0, 171.0); vec3 i = floor(x); vec3 f = fract(x); float n = dot(i, step); vec3 u = f * f * (3.0 - 2.0 * f); return mix(mix(mix( hash(n + dot(step, vec3(0.0, 0.0, 0.0))), hash(n + dot(step, vec3(1.0, 0.0, 0.0))), u.x), mix( hash(n + dot(step, vec3(0.0, 1.0, 0.0))), hash(n + dot(step, vec3(1.0, 1.0, 0.0))), u.x), u.y), mix(mix( hash(n + dot(step, vec3(0.0, 0.0, 1.0))), hash(n + dot(step, vec3(1.0, 0.0, 1.0))), u.x), mix( hash(n + dot(step, vec3(0.0, 1.0, 1.0))), hash(n + dot(step, vec3(1.0, 1.0, 1.0))), u.x), u.y), u.z); }
 
-float noise(float p){
-    float fl = floor(p);
-    float fc = fract(p);
-    return mix(hash(fl), hash(fl + 1.0), fc);
-}
+#define DEFINE_FBM(name, OCTAVES) float name(vec3 x) { float v = 0.0; float a = 0.5; vec3 shift = vec3(100); for (int i = 0; i < OCTAVES; ++i) { v += a * noise(x); x = x * 2.0 + shift; a *= 0.5; } return v; }
+DEFINE_FBM(fbm3, 3)
+DEFINE_FBM(fbm5, 5)
+DEFINE_FBM(fbm6, 6)
 
-float noise(vec2 n) {
-    const vec2 d = vec2(0.0, 1.0);
-    vec2 b = floor(n), f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
-    return mix(mix(hash(b), hash(b + d.yx), f.x), mix(hash(b + d.xy), hash(b + d.yy), f.x), f.y);
+float fbmtest(vec2 x) { 
+    float f = 0.0;
+    f += 0.5*noise(x);
+    return f; 
 }
 
 mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
@@ -131,43 +133,14 @@ float pModInterval1(inout float p, float size, float start, float stop) {
 
 
 vec2 sdf(vec3 p){
-    //pMod2(p.xz, vec2(1.5));
-    //vec2 cube = vec2(box(p, vec3(0.5)),1.0);
-    //return cube;
+    //p = rotateX(time)*p;
+    vec2 sphere = vec2(sp(p, 2.0),1.0);
+    float mountain = clamp(1.0 - fbm3(p * (sin(time)*0.5+0.6)*2.5) + (max(abs(p.y) - 0.6, 0.0)) * 0.03, 0.0, 1.0);
+    mountain = (mountain*mountain*mountain) * 0.25 + 0.8;
+    sphere.x -= mountain;
+    sphere.x *= 0.6;
 
-    //float plane1 = dot(vec3(p.x,p.y,p.z)*rotateX(0.5*time)*rotateZ(0.5*time)*rotateY(0.5*time), normalize(vec3(1.0,1.0,1.0)))+1.0;
-    //float plane2 = dot(p*rotateX(2.0*time+1.17)*rotateY(2.0*time+1.17), normalize(vec3(1.0,0.0,1.0)))+1.0;
-    //float plane3 = dot(p*rotateZ(2.0*time+2.34)*rotateY(2.0*time+2.34), normalize(vec3(0.0,1.0,0.0)))+1.0;
-
-    float torus1 = torus(p*rotateX(0.5*time)*rotateZ(0.5*time)*rotateY(0.5*time),3.0,0.25);
-
-    vec2 c = vec2(pModInterval1(p.x, 1.5, -2.0, 2.0),
-                  pModInterval1(p.z, 1.5, -2.0, 2.0));
-
-    //vec2 cube = vec2(box(p-vec3(0.0,speed,0.0), vec3((sin(time+c.x*c.y)*0.5+0.5)*0.5)),1.0);
-    vec2 sphereLayer1 = vec2(sp(p-vec3(0.0,3.0,0.0), /*(sin(3.0*time+c.x*c.y+3.0)*0.5+0.5)*0.5)*/0.5),1.0);
-    sphereLayer1.x = abs(sphereLayer1.x)-0.01;
-    vec2 sphereLayer2 = vec2(sp(p-vec3(0.0,0.0,0.0), /*(sin(3.0*time+c.x*c.y+1.5)*0.5+0.5)*0.5)*/0.5),2.0);
-    sphereLayer2.x = abs(sphereLayer2.x)-0.03;
-    vec2 sphereLayer3 = vec2(sp(p-vec3(0.0,-3.0,0.0), /*(sin(3.0*time+c.x*c.y)*0.5+0.5)*0.5)*/0.5),3.0);
-    sphereLayer3.x = abs(sphereLayer3.x)-0.06;
-    
-    if(showDisplacements){
-        float f = smoothstep(-0.4,0.4,sin(18.0*p.x)*sin(18.0*p.y)*noise(p.xy)*speed);
-        sphereLayer2.x -= 0.02*f;
-        sphereLayer2.x *= 0.6;
-        f = smoothstep(-0.4,0.4,sin(18.0*p.x)+sin(18.0*p.y));
-        sphereLayer3.x -= 0.02*f;
-        sphereLayer3.x *= 0.6;
-    }
-
-    vec2 resLayer = sphereLayer1.x < sphereLayer2.x ? sphereLayer1 : sphereLayer2;
-    resLayer = resLayer.x < sphereLayer3.x ? resLayer : sphereLayer3;
-
-    //float planes = torus1;
-    //resLayer.x = max(planes, resLayer.x);
-
-    return resLayer;
+    return sphere;
 }
 
 vec3 march(vec3 o, vec3 d, int maxIteration){
