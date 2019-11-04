@@ -14,15 +14,22 @@ class Animation {
             fogAmount: 0.0, 
             fogColor: [0.1,0,0],
             mouse: [0.0,0.0,0.0],
-            gamma: 1.3,
+            gamma: 0.8,
+            sphere: {metalic: 0.5, roughness: 0.5, reflectionOpacity: 1.0},
             overRelaxation: false,
             showDisplacements: false,
             phongShading: true,
             pbrShading: false,
             pause: false,
-            camera: {x:2.0, y:3.0, z:2.0},
+            camera: {x:4.0, y:2.0, z:4.0},
             save:this.saveCanvasFile.bind(this),
             record:this.getRecordedAnimation.bind(this)
+        };
+
+        this.textureData = {
+            thickness: 0.1,
+            frequency: 0.3,
+            amplitude: 0.3
         };
 
         this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
@@ -40,13 +47,26 @@ class Animation {
             }
         });
 
+        this.texControls = new dat.GUI({name:'Texture Data', autoPlace: false});
+        var customContainer = document.getElementById('texgui');
+        customContainer.appendChild(this.texControls.domElement);
+
+        this.texControls.add(this.textureData, 'thickness', 0.01, 3.0, 0.01);
+        this.texControls.add(this.textureData, 'frequency', 0.01, 5.0, 0.01);
+        this.texControls.add(this.textureData, 'amplitude', 0.01, 5.0, 0.01);
+
         this.guiControls = new dat.GUI({name:'Animation Data'});
-        this.guiControls.add(this.guiData, 'speed', 0.0, 5.0, 0.01);
+        this.guiControls.add(this.guiData, 'speed', -1.0, 5.0, 0.01);
         
         this.cameraFolder = this.guiControls.addFolder('Camera');
         this.cameraFolder.add(this.guiData.camera,'x',-5.0,5.0,0.01);
         this.cameraFolder.add(this.guiData.camera,'y',1.0,5.0,0.01);
         this.cameraFolder.add(this.guiData.camera,'z',-5.0,5.0,0.01);
+
+        this.sphereFolder = this.guiControls.addFolder('Sphere PBR');
+        this.sphereFolder.add(this.guiData.sphere,'metalic',0.0,1.0,0.001);
+        this.sphereFolder.add(this.guiData.sphere,'roughness',0.0,1.0,0.001);
+        this.sphereFolder.add(this.guiData.sphere,'reflectionOpacity',0.0,1.0,0.001);
         
         this.fogFolder = this.guiControls.addFolder('Fog');
         this.fogFolder.add(this.guiData, 'fogAmount', 0.0, 2.5, 0.0001);
@@ -168,7 +188,7 @@ class Animation {
             this.shader.uniforms.fogAmount.value = this.lerp(this.shader.uniforms.fogAmount.value, this.guiData.fogAmount, 0.03);
             this.gl.uniform1f(this.shader.uniforms.fogAmount.location, this.shader.uniforms.fogAmount.value);
 
-            this.shader.uniforms.gamma.value = this.lerp(this.shader.uniforms.gamma.value, this.guiData.gamma, 1.0);
+            this.shader.uniforms.gamma.value = this.lerp(this.shader.uniforms.gamma.value, this.guiData.gamma, 0.5);
             this.gl.uniform1f(this.shader.uniforms.gamma.location, this.shader.uniforms.gamma.value);
 
             this.shader.uniforms.overRelaxation.value = +this.guiData.overRelaxation;
@@ -185,6 +205,18 @@ class Animation {
 
             this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.01);
             this.gl.uniform3fv(this.shader.uniforms.camera.location, this.shader.uniforms.camera.value);
+
+            this.shader.uniforms.sphere.value = this.nlerp(this.shader.uniforms.sphere.value, Object.values(this.guiData.sphere), 0.5);
+            this.gl.uniform3fv(this.shader.uniforms.sphere.location, this.shader.uniforms.sphere.value);
+
+            this.shader.uniforms.textureData.value.thickness = this.lerp(this.shader.uniforms.textureData.value.thickness, this.textureData.thickness, 1.0);
+            this.gl.uniform1f(this.shader.uniforms.textureData.location.thickness, this.shader.uniforms.textureData.value.thickness);
+
+            this.shader.uniforms.textureData.value.frequency = this.lerp(this.shader.uniforms.textureData.value.frequency, this.textureData.frequency, 1.0);
+            this.gl.uniform1f(this.shader.uniforms.textureData.location.frequency, this.shader.uniforms.textureData.value.frequency);
+
+            this.shader.uniforms.textureData.value.amplitude = this.lerp(this.shader.uniforms.textureData.value.amplitude, this.textureData.amplitude, 1.0);
+            this.gl.uniform1f(this.shader.uniforms.textureData.location.amplitude, this.shader.uniforms.textureData.value.amplitude);
 
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 

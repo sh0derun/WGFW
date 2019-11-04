@@ -1,0 +1,12 @@
+/* You can add global styles to this file, and also import other style files */
+body{
+	margin:0%;background-color:black;text-align: center;
+}
+canvas{
+	margin-top: -3%; 
+	text-align: center;
+	background-color:black;
+}
+div#texgui{
+	margin:0%;
+}

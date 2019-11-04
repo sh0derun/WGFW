@@ -13,6 +13,21 @@ struct PBRMaterial {
 	vec3 emissive;
 };
 
+//vide 1
+//Air 1.000293
+//Helium  1.000036
+//Hydrogène 1.000132
+//Dioxyde de carbone  1.00045
+//Eau 1.333
+//Ethanol 1.36
+//Huile d'olive 1.47
+//Glace 1.309
+//Soda  1.46
+//PMMA (Plexiglas)  1.49
+//Verre crown (typique) 1.52
+//Verre flint (typique) 1.62
+//Diamant 2.42
+
 PBRMaterial simpleMatOrange = PBRMaterial(vec3(0.9,0.1,0.0),0.8,0.4,vec3(0.0));
 PBRMaterial simpleMatGreen = PBRMaterial(vec3(0.0,1.0,0.0),0.1,0.6,vec3(0.0));
 PBRMaterial simpleMatRed = PBRMaterial(vec3(1.0,0.0,0.0),0.6,0.1,vec3(0.0));
@@ -42,7 +57,7 @@ Material pearl			    = Material(vec3(0.25, 0.20725, 0.20725)		 ,vec3(1.0, 0.829,
 Material ruby			      = Material(vec3(0.1745, 0.01175, 0.01175)	 ,vec3(0.61424, 0.04136, 0.04136),		vec3(0.727811, 0.626959, 0.626959),		 0.6, vec3(0.0));
 Material turquoise		  = Material(vec3(0.1, 0.18725, 0.1745)		 ,vec3(0.396, 0.74151, 0.69102),		vec3(0.297254, 0.30829, 0.306678),		 0.1, vec3(0.0));
 Material bronze			    = Material(vec3(0.2125, 0.1275, 0.054),		  vec3(0.714, 0.4284, 0.18144),			vec3(0.393548, 0.271906, 0.166721),		 0.2, vec3(0.0));
-Material chrome			    = Material(vec3(0.25, 0.25, 0.25),			  vec3(0.4, 0.4, 0.4),					vec3(0.774597, 0.774597, 0.774597),		 32.0, vec3(0.0));
+Material chrome			    = Material(vec3(0.25, 0.25, 0.25),			  vec3(0.4, 0.4, 0.4),					vec3(0.774597, 0.774597, 0.774597),		 0.6, vec3(0.0));
 Material copper			    = Material(vec3(0.19125, 0.0735, 0.0225),	  vec3(0.7038, 0.27048, 0.0828),		vec3(0.256777, 0.137622, 0.086014),		 0.1, vec3(0.0));
 Material gold			      = Material(vec3(0.24725, 0.1995, 0.0745),	  vec3(0.75164, 0.60648, 0.22648),		vec3(0.628281, 0.555802, 0.366065),		 0.4, vec3(0.0));
 Material silver			    = Material(vec3(0.19225, 0.19225, 0.19225),	  vec3(0.50754, 0.50754, 0.50754),		vec3(0.508273, 0.508273, 0.508273),		 0.4, vec3(0.0));
@@ -58,3 +73,12 @@ Material green_rubber	  = Material(vec3(0.0, 0.05, 0.0),			  vec3(0.4, 0.5, 0.4)
 Material red_rubber		  = Material(vec3(0.05, 0.0, 0.0),			  vec3(0.5, 0.4, 0.4),					vec3(0.7, 0.04, 0.04),					 0.078125, vec3(0.0));
 Material white_rubber	  = Material(vec3(0.05, 0.05, 0.05),			  vec3(0.5, 0.5, 0.5),					vec3(0.7, 0.7, 0.7),					 0.078125, vec3(0.0));
 Material yellow_rubber	= Material(vec3(0.05, 0.05, 0.0),			  vec3(0.5, 0.5, 0.4),					vec3(0.7, 0.7, 0.04),					 0.078125, vec3(0.0));
+
+
+Material mixMaterial(Material a, Material b, float x){
+  return Material(mix(a.ambient, b.ambient, x),
+             mix(a.diffuse, b.diffuse, x),
+             mix(a.specular, b.specular, x),
+             mix(a.shininess, b.shininess, x),
+             mix(a.emissive, b.emissive, x));
+}

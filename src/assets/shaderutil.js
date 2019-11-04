@@ -12,7 +12,7 @@ class ShaderUtil{
 	};
 
 	static parseShaderData(gl, shaderClass){
-		var shaderData = ShaderUtil.loadJSON("./shaders/shader_data/uniforms.json");
+		var shaderData = ShaderUtil.loadJSON("../assets/shaders/shader_data/uniforms.json");
 		console.log(shaderData);
 		if(shaderData.uniforms){
 			for(var i = 0; i < shaderData.uniforms.length; i++){
@@ -40,7 +40,7 @@ class ShaderUtil{
 		for(var i = 0; i < source.length; i++){
 			if(source[i].startsWith('#include')){
 				var shaderType = source[i].substring(source[i].indexOf("<")+1,source[i].indexOf(".glsl>"));
-				var res = ShaderUtil.loadShaderSource("./shaders/"+shaderType+".glsl");
+				var res = ShaderUtil.loadShaderSource("../assets/shaders/"+shaderType+".glsl");
 				if(res !== null){
 					source[i] = '\n'+res+'\n';
 				}
