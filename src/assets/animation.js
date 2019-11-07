@@ -56,7 +56,7 @@ class Animation {
         this.texControls.add(this.textureData, 'amplitude', 0.01, 5.0, 0.01);
 
         this.guiControls = new dat.GUI({name:'Animation Data'});
-        this.guiControls.add(this.guiData, 'speed', -1.0, 5.0, 0.01);
+        this.guiControls.add(this.guiData, 'speed', -5.0, 5.0, 0.001);
         
         this.cameraFolder = this.guiControls.addFolder('Camera');
         this.cameraFolder.add(this.guiData.camera,'x',-5.0,5.0,0.01);
@@ -185,7 +185,7 @@ class Animation {
             this.shader.uniforms.speed.value = this.lerp(this.shader.uniforms.speed.value, this.guiData.speed, 1.0);
             this.gl.uniform1f(this.shader.uniforms.speed.location, this.shader.uniforms.speed.value);
 
-            this.shader.uniforms.fogAmount.value = this.lerp(this.shader.uniforms.fogAmount.value, this.guiData.fogAmount, 0.03);
+            this.shader.uniforms.fogAmount.value = this.lerp(this.shader.uniforms.fogAmount.value, this.guiData.fogAmount, 1.0);
             this.gl.uniform1f(this.shader.uniforms.fogAmount.location, this.shader.uniforms.fogAmount.value);
 
             this.shader.uniforms.gamma.value = this.lerp(this.shader.uniforms.gamma.value, this.guiData.gamma, 0.5);

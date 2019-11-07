@@ -31,9 +31,14 @@ struct PBRMaterial {
 PBRMaterial simpleMatOrange = PBRMaterial(vec3(0.9,0.1,0.0),0.8,0.4,vec3(0.0));
 PBRMaterial simpleMatGreen = PBRMaterial(vec3(0.0,1.0,0.0),0.1,0.6,vec3(0.0));
 PBRMaterial simpleMatRed = PBRMaterial(vec3(1.0,0.0,0.0),0.6,0.1,vec3(0.0));
-PBRMaterial simpleMatWhite = PBRMaterial(vec3(1.0),0.6,0.1,vec3(0.0));
+PBRMaterial simpleMatWhite = PBRMaterial(vec3(1.0),0.9,0.9,vec3(0.0));
 PBRMaterial simpleMatGray = PBRMaterial(vec3(0.4),0.6,0.1,vec3(0.0));
+PBRMaterial simpleMatBrown = PBRMaterial(vec3(0.8, 0.271, 0.075),0.6,0.1,vec3(0.0));
+PBRMaterial simpleMatBlue = PBRMaterial(vec3(0.000, 0.000, 0.9),0.8,0.4,vec3(0.0));
 
+//brown 0.545, 0.271, 0.075
+//ice 0.686, 0.933, 0.933
+//ocean   0.275, 0.510, 0.706
 PBRMaterial mixPBRMterial(PBRMaterial a, PBRMaterial b, float x){
 	return PBRMaterial(mix(a.albedo, b.albedo, x),
 					   mix(a.metalic, b.metalic, x),

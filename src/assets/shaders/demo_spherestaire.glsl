@@ -145,16 +145,21 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
                     
                     if(t.y < 1.5){
                         float dist_sp = sp(p,4.0);
-                        if(dist_sp < -1.035){
+                        if(dist_sp < -1.0199){
                             material = cyan_plastic;
                             material.diffuse *= smoothstep(0.0,0.48,noise(rotateY(-time)*p*8.0));
                         }
-                        else if(dist_sp >= -1.035 && dist_sp < -0.85){
+                        else if(dist_sp >= -1.0199 && dist_sp < -0.85){
                             material = bronze;
                         }
                         else{
                             material = jade;
                         }
+                        material.shininess *= 30.0;
+                    }
+                    else if(t.y < 2.5){
+                        material = white_rubber;
+                        material.diffuse *= smoothstep(0.0,0.48,noise(p*8.0));
                         material.shininess *= 30.0;
                     }
 
@@ -187,10 +192,20 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
                 }
                 else if(pbrShading){
                     PBRMaterial material;
-
                     if(t.y < 1.5){
-                        //simpleMatRed
-                        material = simpleMatRed;
+                        float dist_sp = sp(p,4.0);
+                        if(dist_sp < -1.037){
+                            material = simpleMatBlue;
+                        }
+                        else if(dist_sp >= -1.037 && dist_sp < -0.85){
+                            material = simpleMatBrown;
+                        }
+                        else{
+                            material = simpleMatWhite;
+                        }
+                    }
+                    else if(t.y < 2.5){
+                        material = simpleMatWhite;
                     }
 
                     vec3 F0 = vec3(0.02, 0.02, 0.02);

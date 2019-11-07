@@ -158,16 +158,23 @@ float pModInterval1(inout float p, float size, float start, float stop) {
     return c;
 }*/
 
-
 vec2 sdf(vec3 p){
-    p *= rotateY(time);
-    vec2 sphere = vec2(sp(p, 4.0),1.0);
-    float mountain = clamp(1.0 - noise(p * /*(sin(time)*0.5+0.5)*/ 2.5) + (max(abs(p.y) - 1.0, 0.0)) * 0.03, 0.0, 1.0);
+    vec3 q = p;
+    q *= rotateY(time);
+    vec2 sphere = vec2(sp(q, 4.0),1.0);
+    float mountain = clamp(1.0 - noise(q * /*(sin(time)*0.5+0.5)*/ 2.5) + (max(abs(q.y) - 1.0, 0.0)) * 0.03, 0.0, 1.0);
     mountain = (mountain*mountain*mountain) * 0.25 + 0.8;
     sphere.x += mountain;
     sphere.x *= 0.6;
 
-    return sphere;
+    vec2 outSphere = vec2(sp(p, 3.7),2.0);
+    outSphere.x = abs(outSphere.x)+0.35;
+    outSphere.x += noise(p * /*(sin(time)*0.5+0.5)*/ 1.52 + time*0.75);
+    outSphere.x *= 0.6;
+
+    vec2 resSphere = sphere.x < outSphere.x ? sphere : outSphere;
+
+    return resSphere;
 }
 
 vec3 march(vec3 o, vec3 d, int maxIteration){
