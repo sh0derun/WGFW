@@ -29,7 +29,7 @@ void main( void ){
     vec2 uv = (gl_FragCoord.xy / resolution*2.0-1.0);
     uv.x *= resolution.x/resolution.y;
 
-    outColor = vec4(fbmtest(uv));return;
+    //outColor = vec4(fbm(speed*4.0*vec3(uv,0.0)));return;
 
     float tm = time;
     O = vec3(0.0,0.0,-10.0);//+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),3.0*noise(tm*1.4),3.0*noise(tm*1.7));//vec3(camera.x*cos(tm*0.1)*speed,camera.y,camera.z*sin(tm*0.1)*speed)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),0.0,3.0*noise(tm*1.7));
@@ -144,8 +144,17 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
                     Material material;
                     
                     if(t.y < 1.5){
-                        //red_rubber
-                        material = cyan_plastic;
+                        float dist_sp = sp(p,4.0);
+                        if(dist_sp < -1.035){
+                            material = cyan_plastic;
+                            material.diffuse *= smoothstep(0.0,0.48,noise(rotateY(-time)*p*8.0));
+                        }
+                        else if(dist_sp >= -1.035 && dist_sp < -0.85){
+                            material = bronze;
+                        }
+                        else{
+                            material = jade;
+                        }
                         material.shininess *= 30.0;
                     }
 
@@ -181,7 +190,7 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
 
                     if(t.y < 1.5){
                         //simpleMatRed
-                        material = simpleMatOrange;
+                        material = simpleMatRed;
                     }
 
                     vec3 F0 = vec3(0.02, 0.02, 0.02);

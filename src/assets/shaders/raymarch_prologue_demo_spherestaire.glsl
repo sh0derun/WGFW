@@ -1,21 +1,48 @@
 #define saturate(x) (clamp((x), 0.0, 1.0))
 
-float hash(float p) { p = fract(p * 0.011); p *= p + 7.5; p *= p + p; return fract(p); }
+float hash( float n ){return fract(sin(n)*758.5453);}
 float hash(vec2 p) {vec3 p3 = fract(vec3(p.xyx) * 0.13); p3 += dot(p3, p3.yzx + 3.333); return fract((p3.x + p3.y) * p3.z); }
 float noise(float x) { float i = floor(x); float f = fract(x); float u = f * f * (3.0 - 2.0 * f); return mix(hash(i), hash(i + 1.0), u); }
 float noise(vec2 x) { vec2 i = floor(x); vec2 f = fract(x); float a = hash(i); float b = hash(i + vec2(1.0, 0.0)); float c = hash(i + vec2(0.0, 1.0)); float d = hash(i + vec2(1.0, 1.0)); vec2 u = f * f * (3.0 - 2.0 * f); return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y; }
-float noise(vec3 x) { const vec3 step = vec3(110.0, 241.0, 171.0); vec3 i = floor(x); vec3 f = fract(x); float n = dot(i, step); vec3 u = f * f * (3.0 - 2.0 * f); return mix(mix(mix( hash(n + dot(step, vec3(0.0, 0.0, 0.0))), hash(n + dot(step, vec3(1.0, 0.0, 0.0))), u.x), mix( hash(n + dot(step, vec3(0.0, 1.0, 0.0))), hash(n + dot(step, vec3(1.0, 1.0, 0.0))), u.x), u.y), mix(mix( hash(n + dot(step, vec3(0.0, 0.0, 1.0))), hash(n + dot(step, vec3(1.0, 0.0, 1.0))), u.x), mix( hash(n + dot(step, vec3(0.0, 1.0, 1.0))), hash(n + dot(step, vec3(1.0, 1.0, 1.0))), u.x), u.y), u.z); }
 
-#define DEFINE_FBM(name, OCTAVES) float name(vec3 x) { float v = 0.0; float a = 0.5; vec3 shift = vec3(100); for (int i = 0; i < OCTAVES; ++i) { v += a * noise(x); x = x * 2.0 + shift; a *= 0.5; } return v; }
-DEFINE_FBM(fbm3, 3)
-DEFINE_FBM(fbm5, 5)
-DEFINE_FBM(fbm6, 6)
+const mat3 m = mat3( 0.00,  0.80,  0.60,
+                    -0.80,  0.36, -0.48,
+                    -0.60, -0.48,  0.64 );
 
-float fbmtest(vec2 x) { 
-    float f = 0.0;
-    f += 0.5*noise(x);
-    return f; 
+vec3 hash( vec3 p ) // replace this by something better
+{
+    p = vec3( dot(p,vec3(127.1,311.7, 74.7)),
+              dot(p,vec3(269.5,183.3,246.1)),
+              dot(p,vec3(113.5,271.9,124.6)));
+
+    return -1.0 + 2.0*fract(sin(p)*43758.5453123);
 }
+
+float noise( in vec3 p )
+{
+    vec3 i = floor( p );
+    vec3 f = fract( p );
+    
+    vec3 u = f*f*(3.0-2.0*f);
+
+    return mix( mix( mix( dot( hash( i + vec3(0.0,0.0,0.0) ), f - vec3(0.0,0.0,0.0) ), 
+                          dot( hash( i + vec3(1.0,0.0,0.0) ), f - vec3(1.0,0.0,0.0) ), u.x),
+                     mix( dot( hash( i + vec3(0.0,1.0,0.0) ), f - vec3(0.0,1.0,0.0) ), 
+                          dot( hash( i + vec3(1.0,1.0,0.0) ), f - vec3(1.0,1.0,0.0) ), u.x), u.y),
+                mix( mix( dot( hash( i + vec3(0.0,0.0,1.0) ), f - vec3(0.0,0.0,1.0) ), 
+                          dot( hash( i + vec3(1.0,0.0,1.0) ), f - vec3(1.0,0.0,1.0) ), u.x),
+                     mix( dot( hash( i + vec3(0.0,1.0,1.0) ), f - vec3(0.0,1.0,1.0) ), 
+                          dot( hash( i + vec3(1.0,1.0,1.0) ), f - vec3(1.0,1.0,1.0) ), u.x), u.y), u.z );
+}
+
+float fbm(vec3 p){
+    float f  = 0.5000*noise( p ); p = m*p*2.01;
+    f += 0.2500*noise( p ); p = m*p*2.02;
+    f += 0.1250*noise( p ); p = m*p*2.03;
+    f += 0.0625*noise( p ); p = m*p*2.01;
+    return smoothstep( -0.7, 0.7, f );
+}
+
 
 mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
 
@@ -133,11 +160,11 @@ float pModInterval1(inout float p, float size, float start, float stop) {
 
 
 vec2 sdf(vec3 p){
-    //p = rotateX(time)*p;
-    vec2 sphere = vec2(sp(p, 2.0),1.0);
-    float mountain = clamp(1.0 - fbm3(p * (sin(time)*0.5+0.6)*2.5) + (max(abs(p.y) - 0.6, 0.0)) * 0.03, 0.0, 1.0);
+    p *= rotateY(time);
+    vec2 sphere = vec2(sp(p, 4.0),1.0);
+    float mountain = clamp(1.0 - noise(p * /*(sin(time)*0.5+0.5)*/ 2.5) + (max(abs(p.y) - 1.0, 0.0)) * 0.03, 0.0, 1.0);
     mountain = (mountain*mountain*mountain) * 0.25 + 0.8;
-    sphere.x -= mountain;
+    sphere.x += mountain;
     sphere.x *= 0.6;
 
     return sphere;
