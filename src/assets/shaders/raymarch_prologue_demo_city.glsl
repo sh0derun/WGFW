@@ -1,19 +1,48 @@
 #define saturate(x) (clamp((x), 0.0, 1.0))
 
-float hash (float st) {return fract(sin(st*12.9898)*43758.5453123);}
-float hash (vec2 st) {return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);}
+float hash( float n ){return fract(sin(n)*758.5453);}
+float hash(vec2 p) {vec3 p3 = fract(vec3(p.xyx) * 0.13); p3 += dot(p3, p3.yzx + 3.333); return fract((p3.x + p3.y) * p3.z); }
+float noise(float x) { float i = floor(x); float f = fract(x); float u = f * f * (3.0 - 2.0 * f); return mix(hash(i), hash(i + 1.0), u); }
+float noise(vec2 x) { vec2 i = floor(x); vec2 f = fract(x); float a = hash(i); float b = hash(i + vec2(1.0, 0.0)); float c = hash(i + vec2(0.0, 1.0)); float d = hash(i + vec2(1.0, 1.0)); vec2 u = f * f * (3.0 - 2.0 * f); return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y; }
 
-float noise(float p){
-    float fl = floor(p);
-    float fc = fract(p);
-    return mix(hash(fl), hash(fl + 1.0), fc);
+const mat3 m = mat3( 0.00,  0.80,  0.60,
+                    -0.80,  0.36, -0.48,
+                    -0.60, -0.48,  0.64 );
+
+vec3 hash( vec3 p ) // replace this by something better
+{
+    p = vec3( dot(p,vec3(127.1,311.7, 74.7)),
+              dot(p,vec3(269.5,183.3,246.1)),
+              dot(p,vec3(113.5,271.9,124.6)));
+
+    return -1.0 + 2.0*fract(sin(p)*43758.5453123);
 }
 
-float noise(vec2 n) {
-    const vec2 d = vec2(0.0, 1.0);
-    vec2 b = floor(n), f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
-    return mix(mix(hash(b), hash(b + d.yx), f.x), mix(hash(b + d.xy), hash(b + d.yy), f.x), f.y);
+float noise( in vec3 p )
+{
+    vec3 i = floor( p );
+    vec3 f = fract( p );
+    
+    vec3 u = f*f*(3.0-2.0*f);
+
+    return mix( mix( mix( dot( hash( i + vec3(0.0,0.0,0.0) ), f - vec3(0.0,0.0,0.0) ), 
+                          dot( hash( i + vec3(1.0,0.0,0.0) ), f - vec3(1.0,0.0,0.0) ), u.x),
+                     mix( dot( hash( i + vec3(0.0,1.0,0.0) ), f - vec3(0.0,1.0,0.0) ), 
+                          dot( hash( i + vec3(1.0,1.0,0.0) ), f - vec3(1.0,1.0,0.0) ), u.x), u.y),
+                mix( mix( dot( hash( i + vec3(0.0,0.0,1.0) ), f - vec3(0.0,0.0,1.0) ), 
+                          dot( hash( i + vec3(1.0,0.0,1.0) ), f - vec3(1.0,0.0,1.0) ), u.x),
+                     mix( dot( hash( i + vec3(0.0,1.0,1.0) ), f - vec3(0.0,1.0,1.0) ), 
+                          dot( hash( i + vec3(1.0,1.0,1.0) ), f - vec3(1.0,1.0,1.0) ), u.x), u.y), u.z );
 }
+
+float fbm(vec3 p){
+    float f  = 0.5000*noise( p ); p = m*p*2.01;
+    f += 0.2500*noise( p ); p = m*p*2.02;
+    f += 0.1250*noise( p ); p = m*p*2.03;
+    f += 0.0625*noise( p ); p = m*p*2.01;
+    return smoothstep( -0.7, 0.7, f );
+}
+
 
 mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
 
@@ -40,7 +69,7 @@ float sp(vec3 p, float s){
 
 float pln(vec3 p){
     float freq = 1.1;
-    float ph = 0.19;//*(sin(freq*p.x)+sin(freq*p.z));
+    float ph = 0.19*(sin(freq*p.x)+sin(freq*p.z));
     return p.y + ph;
 }
 
@@ -70,6 +99,11 @@ float sminCubic( float a, float b, float k ){
     return min( a, b ) - h*h*h*k*(1.0/6.0);
 }
 
+vec2 sminCubic( vec2 a, vec2 b, float k ){
+    vec2 h = max( k-abs(a-b), 0.0 )/k;
+    return min( a, b ) - h*h*h*k*(1.0/6.0);
+}
+
 vec2 opBlend(vec2 d1, vec2 d2){
     float k = 2.0;
     float d = sminCubic(d1.x, d2.x, k);
@@ -92,13 +126,6 @@ float fHexagonCircumcircle(vec3 p, vec2 h) {
     //return max(q.y - h.y, max(dot(vec2(cos(PI/3), sin(PI/3)), q.zx), q.z) - h.x);
 }
 
-// Repeat in two dimensions
-vec2 pMod2(inout vec2 p, vec2 size) {
-    vec2 c = floor((p + size*0.5)/size);
-    p = mod(p + size*0.5,size) - size*0.5;
-    return c;
-}
-
 float pModInterval1(inout float p, float size, float start, float stop) {
     float halfsize = size*0.5;
     float c = floor((p + halfsize)/size);
@@ -112,6 +139,13 @@ float pModInterval1(inout float p, float size, float start, float stop) {
         c = start;
     }
     return c;
+}
+
+
+float fCapsule( vec3 p, float h, float r )
+{
+  p.y -= clamp( p.y, 0.0, h );
+  return length( p ) - r;
 }
 
 /*float pModInterval2(inout vec2 p, vec2 size, vec2 start, vec2 stop) {
@@ -129,45 +163,26 @@ float pModInterval1(inout float p, float size, float start, float stop) {
     return c;
 }*/
 
+vec2 pMod2(inout vec2 p, vec2 size) {
+    vec2 c = floor((p + size*0.5)/size);
+    p = mod(p + size*0.5,size) - size*0.5;
+    return c;
+}
 
 vec2 sdf(vec3 p){
-    //pMod2(p.xz, vec2(1.5));
-    //vec2 cube = vec2(box(p, vec3(0.5)),1.0);
-    //return cube;
+    vec3 q = p;
+    vec2 plane = vec2(pln(q),2.0);
 
-    //float plane1 = dot(vec3(p.x,p.y,p.z)*rotateX(0.5*time)*rotateZ(0.5*time)*rotateY(0.5*time), normalize(vec3(1.0,1.0,1.0)))+1.0;
-    //float plane2 = dot(p*rotateX(2.0*time+1.17)*rotateY(2.0*time+1.17), normalize(vec3(1.0,0.0,1.0)))+1.0;
-    //float plane3 = dot(p*rotateZ(2.0*time+2.34)*rotateY(2.0*time+2.34), normalize(vec3(0.0,1.0,0.0)))+1.0;
+    vec2 c = pMod2(q.xz, vec2(3.0));
 
-    float torus1 = torus(p*rotateX(0.5*time)*rotateZ(0.5*time)*rotateY(0.5*time),3.0,0.25);
+    //vec2 box = vec2(box(q*rotateX(time)*rotateY(time), vec3(2.0)),1.0);
+    vec2 obj = vec2(box(q, vec3(0.5,(noise(5.0*(c.x+c.y)+10.0)*0.5+0.5)*5.0,0.5)), 1.0);
 
-    vec2 c = vec2(pModInterval1(p.x, 1.5, -2.0, 2.0),
-                  pModInterval1(p.z, 1.5, -2.0, 2.0));
-
-    //vec2 cube = vec2(box(p-vec3(0.0,speed,0.0), vec3((sin(time+c.x*c.y)*0.5+0.5)*0.5)),1.0);
-    vec2 sphereLayer1 = vec2(sp(p-vec3(0.0,3.0,0.0), /*(sin(3.0*time+c.x*c.y+3.0)*0.5+0.5)*0.5)*/0.5),1.0);
-    sphereLayer1.x = abs(sphereLayer1.x)-0.01;
-    vec2 sphereLayer2 = vec2(sp(p-vec3(0.0,0.0,0.0), /*(sin(3.0*time+c.x*c.y+1.5)*0.5+0.5)*0.5)*/0.5),2.0);
-    sphereLayer2.x = abs(sphereLayer2.x)-0.03;
-    vec2 sphereLayer3 = vec2(sp(p-vec3(0.0,-3.0,0.0), /*(sin(3.0*time+c.x*c.y)*0.5+0.5)*0.5)*/0.5),3.0);
-    sphereLayer3.x = abs(sphereLayer3.x)-0.06;
+    obj = sminCubic(obj, plane, speed);
     
-    if(showDisplacements){
-        float f = smoothstep(-0.4,0.4,sin(18.0*p.x)*sin(18.0*p.y)*noise(p.xy)*speed);
-        sphereLayer2.x -= 0.02*f;
-        sphereLayer2.x *= 0.6;
-        f = smoothstep(-0.4,0.4,sin(18.0*p.x)+sin(18.0*p.y));
-        sphereLayer3.x -= 0.02*f;
-        sphereLayer3.x *= 0.6;
-    }
-
-    vec2 resLayer = sphereLayer1.x < sphereLayer2.x ? sphereLayer1 : sphereLayer2;
-    resLayer = resLayer.x < sphereLayer3.x ? resLayer : sphereLayer3;
-
-    //float planes = torus1;
-    //resLayer.x = max(planes, resLayer.x);
-
-    return resLayer;
+    /*q = mod(q,vec3(3.0))-1.5;
+    vec2 sphere = vec2(sp(q-vec3(0.0,0.0,0.0), 0.3),1.0);*/
+    return obj;
 }
 
 vec3 march(vec3 o, vec3 d, int maxIteration){
@@ -180,17 +195,19 @@ vec3 march(vec3 o, vec3 d, int maxIteration){
         t.x += d.x;
         t.y = d.y;
         if(t.x > MAX_DIST || abs(d.x) < (0.001*t.x)) break;
+        //if(d.x < 0.001) break;
     }
     return vec3(t,iter);
 }
 
-float tr(vec3 o, vec3 d, float Ml){
-    float l = 0.0;
+vec2 tr(vec3 o, vec3 d){
+    vec2 l = vec2(0.0);
     for(int i = 0; i < 100; i++){
-        vec3 p = o + d * l;
-        float dd = sdf(p).x;
-        l += dd;
-        if(dd < 0.001)break;
+        vec3 p = o + d * l.x;
+        vec2 dd = sdf(p);
+        l.x += dd.x;
+        l.y = dd.y;
+        if(dd.x < 0.001)break;
     }
     return l;
 }

@@ -16,7 +16,7 @@ export class AppComponent implements AfterViewInit{
 		gl.setClearColor({r:1.0,g:0.0,b:0.0,a:0.3});
 		gl.clear();
 		
-		var shader = new Shader('../assets/shaders/vertexshader.glsl', '../assets/shaders/demo_spherestaire.glsl');
+		var shader = new Shader('../assets/shaders/vertexshader.glsl', '../assets/shaders/demo1.glsl');
 
 		shader.compileShaders(gl.ctx);
 		shader.initProgramShader(gl.ctx);

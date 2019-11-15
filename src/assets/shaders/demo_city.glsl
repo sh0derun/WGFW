@@ -12,7 +12,7 @@ out vec4 outColor;
 #include<material.glsl>
 #include<light.glsl>
 
-#include<raymarch_prologue_demo.glsl>
+#include<raymarch_prologue_demo_city.glsl>
 
 int maxiter = 100;
 int reflectionCount = 1;
@@ -25,27 +25,29 @@ float rayMarchingReflections( vec3 origin, vec3 dir, float start, float end );
 vec3 O, Ot, D, Dt, P, N, kc = E.zzz;
 
 void main( void ){
-    //outColor = vec4(sphere,1.0);return;
+    //outColor = vec4(fbm3(uv));return;
     vec2 uv = (gl_FragCoord.xy / resolution*2.0-1.0);
     uv.x *= resolution.x/resolution.y;
 
+    //outColor = vec4(fbm(speed*4.0*vec3(uv,0.0)));return;
+
     float tm = time;
-    O = vec3(0.0,0.0,-10.0)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),3.0*noise(tm*1.4),3.0*noise(tm*1.7));//vec3(camera.x*cos(tm*0.1)*speed,camera.y,camera.z*sin(tm*0.1)*speed)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),0.0,3.0*noise(tm*1.7));
+    O = vec3(4.5,1.0,5.0*time);//vec3(4.0*cos(tm),3.0,4.0*sin(tm));//+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),3.0*noise(tm*1.4),3.0*noise(tm*1.7));//vec3(camera.x*cos(tm*0.1)*speed,camera.y,camera.z*sin(tm*0.1)*speed)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),0.0,3.0*noise(tm*1.7));
     Ot = vec3(camera.x*cos(tm),camera.y,camera.z*sin(tm))+1.5*sin(tm)*vec3(2.0*noise(tm*1.4),0.0,2.0*noise(tm*1.7));
-    vec3 camTar = vec3(0.0,0.0,0.0);
+    vec3 camTar = vec3(4.5,1.0,5.0*time+3.0);
     vec3 camDir = normalize(camTar - O);
     vec3 Up = vec3(0.0,1.0,0.0);
     vec3 camRight = normalize(cross(camDir,Up));
     vec3 camUp = cross(camRight, camDir);
     
     D = normalize(uv.x*camRight + uv.y*camUp + 1.5*camDir);
-    Dt = normalize(uv.x*camRight + uv.y*camUp + 1.5*camDir);
+    //Dt = normalize(uv.x*camRight + uv.y*camUp + 1.5*camDir);
 
     vec3 t = vec3(0.0);
     vec3 col = vec3(0.0);
     
     if(!overRelaxation){
-        t = march(O, D, maxiter);
+        t = march(O, D, maxiter);//tr(O, D).xyy
     }
     else{
         t.xy = marchOverrelaxation(O, D, 0.001, 20.0, 0.001, true);
@@ -140,21 +142,16 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
                                 
                 if(phongShading){
                     Material material;
+                    
                     if(t.y < 1.5){
-                        float f = smoothstep(-0.3,0.3,sin(18.0*p.x)+sin(18.0*p.z)+sin(18.0*p.y));
-                        material = bronze;
-                        material.diffuse *= f;
-                        material.shininess *= 100.0;
-                    }
-                    else if(t.y < 2.5){
-                        material = red_rubber;
+                        material = mixMaterial(cyan_plastic,white_rubber,t.y);
+                        material.diffuse *= smoothstep(0.0,0.48,noise(p*8.0));
                         material.shininess *= 30.0;
                     }
-                    else{//if(t.y < 3.5)
-                        //float f = smoothstep(-0.3,0.3,sin(5.0*p.x)+sin(5.0*p.z)+sin(5.0*p.y));
-                        material = cyan_plastic;
-                        //material.diffuse *= f;
-                        material.shininess *= 80.0;
+                    else if(t.y < 2.5){
+                        material = white_rubber;
+                        material.diffuse *= smoothstep(0.0,0.48,noise(p*8.0));
+                        material.shininess *= 30.0;
                     }
 
                     vec3 ambient = lights[i].ambient * material.ambient;
@@ -186,18 +183,11 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
                 }
                 else if(pbrShading){
                     PBRMaterial material;
-
                     if(t.y < 1.5){
-                        PBRMaterial simpleMatNoisy = mixPBRMterial(simpleMatRed, simpleMatWhite, smoothstep(-0.3,0.3,sin(18.0*p.x)*sin(18.0*p.z)*sin(18.0*p.y)));
-                        material = simpleMatNoisy;
-                    }
-                    else if(t.y < 2.5){
                         material = simpleMatOrange;
                     }
-                    else{//if(t.y < 3.5)
-                        //float f = smoothstep(-0.3,0.3,sin(5.0*p.x)+sin(5.0*p.z)+sin(5.0*p.y));
-                        material = simpleMatRed;
-                        //material.diffuse *= f;
+                    else if(t.y < 2.5){
+                        material = simpleMatWhite;
                     }
 
                     vec3 F0 = vec3(0.02, 0.02, 0.02);
