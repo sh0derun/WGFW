@@ -32,9 +32,9 @@ void main( void ){
     //outColor = vec4(fbm(speed*4.0*vec3(uv,0.0)));return;
 
     float tm = time;
-    O = vec3(4.5,1.0,5.0*time);//vec3(4.0*cos(tm),3.0,4.0*sin(tm));//+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),3.0*noise(tm*1.4),3.0*noise(tm*1.7));//vec3(camera.x*cos(tm*0.1)*speed,camera.y,camera.z*sin(tm*0.1)*speed)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),0.0,3.0*noise(tm*1.7));
+    O = vec3(0.0,2.0,3.0);//+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),3.0*noise(tm*1.4),3.0*noise(tm*1.7));//vec3(camera.x*cos(tm*0.1)*speed,camera.y,camera.z*sin(tm*0.1)*speed)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),0.0,3.0*noise(tm*1.7));
     Ot = vec3(camera.x*cos(tm),camera.y,camera.z*sin(tm))+1.5*sin(tm)*vec3(2.0*noise(tm*1.4),0.0,2.0*noise(tm*1.7));
-    vec3 camTar = vec3(4.5,1.0,5.0*time+3.0);
+    vec3 camTar = vec3(0.0,0.0,0.0);
     vec3 camDir = normalize(camTar - O);
     vec3 Up = vec3(0.0,1.0,0.0);
     vec3 camRight = normalize(cross(camDir,Up));
@@ -54,7 +54,7 @@ void main( void ){
     }
 
     if(t.x < MAX_DIST){
-        if(t.y == 44.0){
+        if(t.y < 1.5){
             for(int i = 0; i < 2; i++){
                 vec3 t = march(O, D, maxiter);
                 P = O + D * t.x;
@@ -108,14 +108,14 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
 
     vec3 lipos = vec3(2.0,3.0,2.0);
     PointLight lights[NUM_LIGHTS];
-    lights[0] = PointLight(vec3(-7.0,4.0,-7.0),vec3(1.0,0.0,0.0),vec3(1.0,0.1,0.2),vec3(0.2,0.2,0.2),attenuationLvl10);
-    lights[1] = PointLight(vec3(-7.0,4.0,7.0),vec3(0.0,1.0,0.0),vec3(0.2,0.5,0.9),vec3(0.3,0.3,0.3),attenuationLvl10);
-    lights[2] = PointLight(vec3(7.0,4.0,-7.0),vec3(0.0,0.0,1.0),vec3(0.9,0.2,0.1),vec3(0.6,0.6,0.6),attenuationLvl10);
-    lights[3] = PointLight(vec3(7.0,4.0,7.0),vec3(0.0,0.0,1.0),vec3(0.9,0.9,0.1),vec3(0.6,0.6,0.6),attenuationLvl10);
-    lights[4] = PointLight(vec3(-7.0,-4.0,-7.0),vec3(1.0,0.0,0.0),vec3(0.2),vec3(0.2,0.2,0.2),attenuationLvl10);
-    lights[5] = PointLight(vec3(-7.0,-4.0,7.0),vec3(0.0,1.0,0.0),vec3(0.5),vec3(0.3,0.3,0.3),attenuationLvl10);
-    lights[6] = PointLight(vec3(7.0,-4.0,-7.0),vec3(0.0,0.0,1.0),vec3(0.1),vec3(0.6,0.6,0.6),attenuationLvl10);
-    lights[7] = PointLight(vec3(7.0,-4.0,7.0),vec3(0.0,0.0,1.0),vec3(0.7),vec3(0.6,0.6,0.6),attenuationLvl10);
+    lights[0] = PointLight(vec3(-7.0,7.0,-7.0),vec3(1.0,0.0,0.0),vec3(1.0,0.1,0.2),vec3(0.2,0.2,0.2),attenuationLvl10);
+    lights[1] = PointLight(vec3(-7.0,7.0,7.0),vec3(0.0,1.0,0.0),vec3(0.2,0.5,0.9),vec3(0.3,0.3,0.3),attenuationLvl10);
+    lights[2] = PointLight(vec3(7.0,7.0,-7.0),vec3(0.0,0.0,1.0),vec3(0.9,0.2,0.1),vec3(0.6,0.6,0.6),attenuationLvl10);
+    lights[3] = PointLight(vec3(7.0,7.0,7.0),vec3(0.0,0.0,1.0),vec3(0.9,0.9,0.1),vec3(0.6,0.6,0.6),attenuationLvl10);
+    lights[4] = PointLight(vec3(-7.0,-7.0,-7.0),vec3(1.0,0.0,0.0),vec3(0.2),vec3(0.2,0.2,0.2),attenuationLvl10);
+    lights[5] = PointLight(vec3(-7.0,-7.0,7.0),vec3(0.0,1.0,0.0),vec3(0.5),vec3(0.3,0.3,0.3),attenuationLvl10);
+    lights[6] = PointLight(vec3(7.0,-7.0,-7.0),vec3(0.0,0.0,1.0),vec3(0.1),vec3(0.6,0.6,0.6),attenuationLvl10);
+    lights[7] = PointLight(vec3(7.0,-7.0,7.0),vec3(0.0,0.0,1.0),vec3(0.7),vec3(0.6,0.6,0.6),attenuationLvl10);
 
     DirLight dirlight = DirLight(vec3(cos(time),-.5,sin(time)),vec3(0.4,0.4,0.4),vec3(1.0,1.0,1.0),vec3(0.2,0.2,0.2));
 
@@ -144,14 +144,14 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
                     Material material;
                     
                     if(t.y < 1.5){
-                        material = mixMaterial(cyan_plastic,white_rubber,t.y);
-                        material.diffuse *= smoothstep(0.0,0.48,noise(p*8.0));
-                        material.shininess *= 30.0;
+                        material = cyan_plastic;
+                        material.diffuse *= smoothstep(0.0,1.9,noise(vec3(time*2.5,0.0,0.0)+p/*rotateX(time)*rotateY(time)*rotateZ(time)*/*8.0));
+                        material.shininess *= 150.0;
                     }
                     else if(t.y < 2.5){
-                        material = white_rubber;
-                        material.diffuse *= smoothstep(0.0,0.48,noise(p*8.0));
-                        material.shininess *= 30.0;
+                        material = bronze;
+                        //material = green_plastic;
+                        material.shininess *= 80.0;
                     }
 
                     vec3 ambient = lights[i].ambient * material.ambient;
@@ -187,7 +187,7 @@ vec3 sceneShading(vec2 uv, vec3 o, vec3 d, vec3 t, vec3 kc){
                         material = simpleMatOrange;
                     }
                     else if(t.y < 2.5){
-                        material = simpleMatWhite;
+                        material = simpleMatRed;
                     }
 
                     vec3 F0 = vec3(0.02, 0.02, 0.02);

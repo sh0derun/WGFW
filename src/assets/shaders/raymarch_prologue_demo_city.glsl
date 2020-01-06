@@ -39,7 +39,7 @@ float fbm(vec3 p){
     float f  = 0.5000*noise( p ); p = m*p*2.01;
     f += 0.2500*noise( p ); p = m*p*2.02;
     f += 0.1250*noise( p ); p = m*p*2.03;
-    f += 0.0625*noise( p ); p = m*p*2.01;
+    //f += 0.0625*noise( p ); p = m*p*2.01;
     return smoothstep( -0.7, 0.7, f );
 }
 
@@ -67,9 +67,10 @@ float sp(vec3 p, float s){
     return length(p)-s;
 }
 
-float pln(vec3 p){
-    float freq = 1.1;
-    float ph = 0.19*(sin(freq*p.x)+sin(freq*p.z));
+float pln(vec3 p, float h){
+    float freq = 3.0;
+    float ph = 0.19+h;
+    //float ph = 0.5*noise(freq*p.xzx)+h;
     return p.y + ph;
 }
 
@@ -93,6 +94,11 @@ float torus(vec3 p, float r1, float r2){
 mat3 rotateX(float a){float c=cos(a),s=sin(a); return mat3(1,0,0,0,c,-s,0,s,c);}
 mat3 rotateY(float a){float c=cos(a),s=sin(a); return mat3(c,0,-s,0,1,0,s,0,c);}
 mat3 rotateZ(float a){float c=cos(a),s=sin(a); return mat3(c,-s,0,s,c,0,0,0,1);}
+
+float smaxCubic( float a, float b, float k ){
+    float h = max( k-abs(a-b), 0.0 )/k;
+    return max( a, -b ) - h*h*h*k*(1.0/6.0);
+}
 
 float sminCubic( float a, float b, float k ){
     float h = max( k-abs(a-b), 0.0 )/k;
@@ -148,20 +154,20 @@ float fCapsule( vec3 p, float h, float r )
   return length( p ) - r;
 }
 
-/*float pModInterval2(inout vec2 p, vec2 size, vec2 start, vec2 stop) {
+vec2 pModInterval2(inout vec2 p, vec2 size, vec2 start, vec2 stop) {
     vec2 halfsize = size*0.5;
-    float c = floor((p + halfsize)/size);
+    vec2 c = floor((p + halfsize)/size);
     p = mod(p+halfsize, size) - halfsize;
-    if (c > stop) { //yes, this might not be the best thing numerically.
+    if (c.x > stop.x && c.y > stop.y) { //yes, this might not be the best thing numerically.
         p += size*(c - stop);
         c = stop;
     }
-    if (c <start) {
+    if (c.x < start.x && c.y > start.y) {
         p += size*(c - start);
         c = start;
     }
     return c;
-}*/
+}
 
 vec2 pMod2(inout vec2 p, vec2 size) {
     vec2 c = floor((p + size*0.5)/size);
@@ -169,20 +175,31 @@ vec2 pMod2(inout vec2 p, vec2 size) {
     return c;
 }
 
+float cross(vec3 p, float size){
+    float barx = box(p, vec3(9999.0,size,size));
+    float bary = box(p, vec3(size,9999.0,size));
+    float barz = box(p, vec3(size,size,9999.0));
+    return min(barx,min(bary,barz));
+}
+/*
+struct TextureData {
+  float thickness;
+  float frequency;
+  float amplitude;
+};
+*/
 vec2 sdf(vec3 p){
     vec3 q = p;
-    vec2 plane = vec2(pln(q),2.0);
-
-    vec2 c = pMod2(q.xz, vec2(3.0));
-
-    //vec2 box = vec2(box(q*rotateX(time)*rotateY(time), vec3(2.0)),1.0);
-    vec2 obj = vec2(box(q, vec3(0.5,(noise(5.0*(c.x+c.y)+10.0)*0.5+0.5)*5.0,0.5)), 1.0);
-
-    obj = sminCubic(obj, plane, speed);
-    
-    /*q = mod(q,vec3(3.0))-1.5;
-    vec2 sphere = vec2(sp(q-vec3(0.0,0.0,0.0), 0.3),1.0);*/
-    return obj;
+    //q.y = 1.0-abs(q.y);
+    vec2 plane = vec2(pln(q*rotateX(PI), 0.0),2.0);
+    plane.x += sin(time+p.x*textureData.frequency)*textureData.amplitude;//abs(noise(textureData.frequency*2.0*q.xz+vec2(time*3.0,0.0))*textureData.amplitude);
+    plane.x *= 0.25;
+    vec2 sphere = vec2(sp(q, textureData.thickness*1.25),2.0);
+    vec2 sea = vec2(box(q-vec3(0.0,0.14,0.0),vec3(textureData.thickness*1.25,0.25,textureData.thickness*1.25)),1.0);
+    sphere.x = max(sphere.x,-plane.x);
+    sea.x = max(max(sea.x,-sphere.x),sp(q,textureData.thickness*1.25-0.01));
+    sphere = sphere.x < sea.x ? sphere : sea;
+    return sphere;
 }
 
 vec3 march(vec3 o, vec3 d, int maxIteration){

@@ -1,2 +1,4 @@
 <div id="texgui"></div>
-<canvas id="webglcanvas"></canvas>
+<canvas wgfw [fullScreen]="false"
+             [w]="500" [h]="500" 
+             [vertexShaderLocation]="'../assets/shaders/vertexshader.glsl'" [fragmentShaderLocation]="'../assets/shaders/demo_city.glsl'"></canvas>

@@ -38,4 +38,3 @@ class WGFW{
         this.ctx.vertexAttribPointer(positionLocation, 2, this.ctx.FLOAT, false, 0, 0);
     }
 }
-
