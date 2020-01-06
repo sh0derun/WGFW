@@ -5,10 +5,13 @@ export default class ShaderUtils {
 
     static SHADER_DATA_TYPES = {UNFORM: 'uniform', ATTRIBUT: 'attribut'};
 
-    public static parseShaderData(gl: WebGL2RenderingContext, shaderClass: Shader, programShader: WebGLProgram, canvas: HTMLCanvasElement): Uniform[] {
-        const uniforms: Uniform[] = this.loadJSON('../assets/shaders/shader_data/uniforms.json');
+    public static parseShaderData(gl: WebGL2RenderingContext, shaderClass: Shader, programShader: WebGLProgram, canvas: HTMLCanvasElement): {[key: string]:Uniform}[] {
+        const uniforms: {[key: string]:Uniform}[] = this.loadJSON('../assets/shaders/shader_data/uniforms.json');
+        console.log(uniforms);
         if (uniforms) {
-            uniforms.forEach(uniform => {
+            console.log(Object.values(uniforms));
+            const uniformsValues: any = <unknown>Object.values(uniforms);
+            uniformsValues.forEach(uniform => {
                 const location: WebGLUniformLocation = gl.getUniformLocation(programShader, uniform.name);
                 uniform.location = location;
                 switch (uniform.type) {
@@ -40,6 +43,10 @@ export default class ShaderUtils {
             });
         }
         return uniforms;
+    }
+
+    public static getUniformByName(uniforms: Uniform[], name: string): Uniform {
+        return uniforms.find(uniform => uniform.name === name);
     }
 
     public static combineShader(shader: string): string {

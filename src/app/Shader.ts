@@ -12,7 +12,7 @@ export class Shader {
     uniforms: any;
     attributs: any;
 
-    shaderUniforms: Uniform[];
+    shaderUniforms: {[key: string]:Uniform}[];
 
     constructor(vertexSource: string, fragmentSource: string) {
         this.vertexShaderSource = ShaderUtils.loadShaderSource(vertexSource);
@@ -22,7 +22,7 @@ export class Shader {
         this.programShader = null;
         this.uniforms = {};
         this.attributs = {};
-        this.shaderUniforms = Array<Uniform>();
+        this.shaderUniforms = Array<{[key: string]:Uniform}>();
     }
 
     public compileShaders(gl: WebGL2RenderingContext) {

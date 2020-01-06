@@ -1,5 +1,7 @@
 import { Shader } from './Shader';
 import { GUI } from 'dat.gui';
+import ShaderUtils from './ShaderUtils';
+import { Uniform } from './models/uniform';
 
 export class WGFWAnimator {
 
@@ -105,14 +107,16 @@ export class WGFWAnimator {
     }
 
     private onMouseMove(event): void {
+        const uniform: Uniform = this.shader.shaderUniforms['mouse'];
         this.guiData.mouse = [event.clientX, event.clientY];
-        this.shader.uniforms.mouse.value = this.mappingMouseCoords(this.guiData.mouse);
-        this.gl.uniform2fv(this.shader.uniforms.mouse.location, this.shader.uniforms.mouse.value);
+        uniform.value = [...this.mappingMouseCoords(this.guiData.mouse)];
+        this.gl.uniform2fv(uniform.location, uniform.value);
     }
 
     private onChangeFogColor(): void {
-        this.shader.uniforms.fogColor.value = this.mappingColor(this.guiData.fogColor);
-        this.gl.uniform3fv(this.shader.uniforms.fogColor.location, this.shader.uniforms.fogColor.value);
+        const uniform: Uniform = this.shader.shaderUniforms['fogColor'];
+        uniform.value = [...this.mappingColor(this.guiData.fogColor)];
+        this.gl.uniform3fv(uniform.location, uniform.value);
     }
 
     private onChangeValue(e): void {
@@ -186,11 +190,51 @@ export class WGFWAnimator {
         })();
     }
 
+    private updateUniformsValues(): void {
+        this.shader.uniforms.time.value += 0.01;
+        this.shader.uniforms.speed.value = this.lerp(this.shader.uniforms.speed.value, this.guiData.speed, 1.0);
+        this.shader.uniforms.fogAmount.value = this.lerp(this.shader.uniforms.fogAmount.value, this.guiData.fogAmount, 1.0);
+        this.shader.uniforms.gamma.value = this.lerp(this.shader.uniforms.gamma.value, this.guiData.gamma, 0.5);
+        this.shader.uniforms.overRelaxation.value = +this.guiData.overRelaxation;
+        this.shader.uniforms.showDisplacements.value = +this.guiData.showDisplacements;
+        this.shader.uniforms.phongShading.value = +this.guiData.phongShading;
+        this.shader.uniforms.pbrShading.value = +this.guiData.pbrShading;
+        this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.01);
+        this.shader.uniforms.sphere.value = this.nlerp(this.shader.uniforms.sphere.value, Object.values(this.guiData.sphere), 0.5);
+        this.shader.uniforms.textureData.value.thickness = this.lerp(this.shader.uniforms.textureData.value.thickness,
+                                                                     this.textureData.thickness, 1.0);
+        this.shader.uniforms.textureData.value.frequency = this.lerp(this.shader.uniforms.textureData.value.frequency,
+                                                                     this.textureData.frequency, 1.0);
+        this.shader.uniforms.textureData.value.amplitude = this.lerp(this.shader.uniforms.textureData.value.amplitude,
+                                                                     this.textureData.amplitude, 1.0);
+    }
+
     public render(): void {
         if (!this.guiData.pause) {
             const elapsedtime: number = (Date.now() - this.start) / 1000.0;
             //console.log(0.01/elapsedtime);
             const framespeed = 1.0;
+
+            this.shader.shaderUniforms.forEach(uniform => {
+                switch (uniform.type) {
+                    case ShaderUtils.UNIFORM_TYPES.FLOAT || ShaderUtils.UNIFORM_TYPES.BOOL:
+                        this.gl.uniform1f(location, <number>uniform.value);
+                        break;
+                    case ShaderUtils.UNIFORM_TYPES.VEC2:
+                        this.gl.uniform2fv(location, <number[]>uniform.value);
+                        break;
+                    case ShaderUtils.UNIFORM_TYPES.VEC3:
+                        this.gl.uniform3fv(location, <number[]>uniform.value);
+                        break;
+                    case ShaderUtils.UNIFORM_TYPES.STRUCT:
+                        let index: number = 0;
+                        for(let field of uniform.fields){
+                            this.gl.uniform1f(uniform.location[(<WebGLUniformLocation[]>(uniform.location)).length], uniform.value[index++]);
+                        }
+                        break;
+                }
+            });
+
             this.shader.uniforms.time.value += 0.01;
             this.gl.uniform1f(this.shader.uniforms.time.location, this.shader.uniforms.time.value);
 

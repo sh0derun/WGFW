@@ -1,17 +1,17 @@
-[
-    { "type": "float", "name": "time", "value": 0.0, "location": null, "lerp": 1.0},
-    { "type": "float", "name": "speed", "value": 0.0, "location": null, "lerp": 1.0},
-    { "type": "float", "name": "fogAmount", "value": 0.0, "location": null, "lerp": 1.0},
-    { "type": "float", "name": "gamma", "value": 1.4, "location": null, "lerp": 1.0},
-    { "type": "vec2", "name": "resolution", "value": [600,500], "location": null, "lerp": 1.0},
-    { "type": "vec2", "name": "screenRatio", "value": [600,500], "location": null, "lerp": 1.0},
-    { "type": "vec2", "name": "mouse", "value": [1,3], "location": null, "lerp": 1.0},
-    { "type": "vec3", "name": "fogColor", "value": [1.0,0.0,0.0], "location": null, "lerp": 1.0},
-    { "type": "vec3", "name": "camera", "value": [2,2,2], "location": null, "lerp": 1.0},
-    { "type": "vec3", "name": "sphere", "value": [0.5, 0.5, 0.1], "location": null, "lerp": 1.0},
-    { "type": "bool", "name": "overRelaxation", "value": 0, "location": null, "lerp": 1.0},
-    { "type": "bool", "name": "showDisplacements", "value": 0, "location": null, "lerp": 1.0},
-    { "type": "bool", "name": "phongShading", "value": 0, "location": null, "lerp": 1.0},
-    { "type": "bool", "name": "pbrShading", "value": 0, "location": null, "lerp": 1.0},
-    { "type": "struct", "name": "textureData", "fields": ["thickness","frequency","amplitude"], "value": [0.1,0.2,0.3], "location": [], "lerp": [1.0,1.0,1.0]}
-]
+{
+    "time": { "type": "float", "name": "time", "value": 0.0, "location": null, "lerp": 1.0},
+    "speed": { "type": "float", "name": "speed", "value": 0.0, "location": null, "lerp": 1.0},
+    "fogAmount": { "type": "float", "name": "fogAmount", "value": 0.0, "location": null, "lerp": 1.0},
+    "gamma": { "type": "float", "name": "gamma", "value": 1.4, "location": null, "lerp": 0.5},
+    "resolution": { "type": "vec2", "name": "resolution", "value": [600,500], "location": null, "lerp": 1.0},
+    "screenRatio": { "type": "vec2", "name": "screenRatio", "value": [600,500], "location": null, "lerp": 1.0},
+    "mouse": { "type": "vec2", "name": "mouse", "value": [1,3], "location": null, "lerp": 1.0},
+    "fogColor": { "type": "vec3", "name": "fogColor", "value": [1.0,0.0,0.0], "location": null, "lerp": 1.0},
+    "camera": { "type": "vec3", "name": "camera", "value": [2,2,2], "location": null, "lerp": 0.01},
+    "sphere": { "type": "vec3", "name": "sphere", "value": [0.5, 0.5, 0.1], "location": null, "lerp": 0.5},
+    "overRelaxation": { "type": "bool", "name": "overRelaxation", "value": 0, "location": null, "lerp": 1.0},
+    "showDisplacements": { "type": "bool", "name": "showDisplacements", "value": 0, "location": null, "lerp": 1.0},
+    "phongShading": { "type": "bool", "name": "phongShading", "value": 0, "location": null, "lerp": 1.0},
+    "pbrShading": { "type": "bool", "name": "pbrShading", "value": 0, "location": null, "lerp": 1.0},
+    "textureData": { "type": "struct", "name": "textureData", "fields": ["thickness","frequency","amplitude"], "value": [0.1,0.2,0.3], "location": [], "lerp": [1.0,1.0,1.0]}
+}
