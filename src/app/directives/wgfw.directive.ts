@@ -46,6 +46,7 @@ export class WgfwDirective implements OnInit {
         this.canvasContext.clearColor(1.0, 1.0, 1.0, 1.0);
         this.canvasContext.getExtension('OES_standard_derivatives');
         this.setCanvasSize(this.fullScreen);
+        /* tslint:disable:no-bitwise */
         this.canvasContext.clear(this.canvasContext.COLOR_BUFFER_BIT | this.canvasContext.DEPTH_BUFFER_BIT);
     }
 
