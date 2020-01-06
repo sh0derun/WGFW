@@ -168,7 +168,7 @@ export class WGFWAnimator {
                 window[mozRequestAnimationFrame] ||
                 window[oRequestAnimationFrame] ||
                 window[msRequestAnimationFrame] ||
-                function(callback, element) {
+                function(callback, element){
                     return window.setTimeout(callback, 1000 / 60);
                 };
         })();
@@ -189,6 +189,7 @@ export class WGFWAnimator {
     public render(): void {
         if (!this.guiData.pause) {
             const elapsedtime: number = (Date.now() - this.start) / 1000.0;
+            //console.log(0.01/elapsedtime);
             const framespeed = 1.0;
             this.shader.uniforms.time.value += 0.01;
             this.gl.uniform1f(this.shader.uniforms.time.location, this.shader.uniforms.time.value);

@@ -192,7 +192,7 @@ vec2 sdf(vec3 p){
     vec3 q = p;
     //q.y = 1.0-abs(q.y);
     vec2 plane = vec2(pln(q*rotateX(PI), 0.0),2.0);
-    plane.x += sin(time+p.x*textureData.frequency)*textureData.amplitude;//abs(noise(textureData.frequency*2.0*q.xz+vec2(time*3.0,0.0))*textureData.amplitude);
+    plane.x += abs(noise(textureData.frequency*2.0*q.xz+vec2(time*3.0,0.0))*textureData.amplitude);//sin(time+p.x*textureData.frequency)*textureData.amplitude;
     plane.x *= 0.25;
     vec2 sphere = vec2(sp(q, textureData.thickness*1.25),2.0);
     vec2 sea = vec2(box(q-vec3(0.0,0.14,0.0),vec3(textureData.thickness*1.25,0.25,textureData.thickness*1.25)),1.0);

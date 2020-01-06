@@ -13,20 +13,21 @@ struct PBRMaterial {
 	vec3 emissive;
 };
 
-//vide 1
+//some IOR Values
+//void 1
 //Air 1.000293
 //Helium  1.000036
-//Hydrogène 1.000132
-//Dioxyde de carbone  1.00045
-//Eau 1.333
+//Hydrogen 1.000132
+//Carbon dioxide  1.00045
+//Water 1.333
 //Ethanol 1.36
-//Huile d'olive 1.47
-//Glace 1.309
-//Soda  1.46
+//Olive oil 1.47
+//Glass 1.309
+//Soda water  1.46
 //PMMA (Plexiglas)  1.49
-//Verre crown (typique) 1.52
-//Verre flint (typique) 1.62
-//Diamant 2.42
+//Crown glass (typical) 1.52
+//Flint glass (typical) 1.62
+//Diamond 2.42
 
 PBRMaterial simpleMatOrange = PBRMaterial(vec3(0.9,0.1,0.0),0.8,0.4,vec3(0.0));
 PBRMaterial simpleMatGreen = PBRMaterial(vec3(0.0,1.0,0.0),0.1,0.6,vec3(0.0));
@@ -36,6 +37,7 @@ PBRMaterial simpleMatGray = PBRMaterial(vec3(0.4),0.6,0.1,vec3(0.0));
 PBRMaterial simpleMatBrown = PBRMaterial(vec3(0.8, 0.271, 0.075),0.6,0.1,vec3(0.0));
 PBRMaterial simpleMatBlue = PBRMaterial(vec3(0.000, 0.000, 0.9),0.8,0.4,vec3(0.0));
 
+//some Colors
 //brown 0.545, 0.271, 0.075
 //ice 0.686, 0.933, 0.933
 //ocean   0.275, 0.510, 0.706

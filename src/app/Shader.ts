@@ -1,4 +1,5 @@
 import ShaderUtils from './ShaderUtils';
+import { Uniform } from './models/uniform';
 
 
 export class Shader {
@@ -11,15 +12,17 @@ export class Shader {
     uniforms: any;
     attributs: any;
 
+    shaderUniforms: Uniform[];
+
     constructor(vertexSource: string, fragmentSource: string) {
         this.vertexShaderSource = ShaderUtils.loadShaderSource(vertexSource);
         this.fragShaderSource = ShaderUtils.combineShader(fragmentSource);
-        console.log(this.fragShaderSource);
         this.vertexShader = null;
         this.fragmentShader = null;
         this.programShader = null;
         this.uniforms = {};
         this.attributs = {};
+        this.shaderUniforms = Array<Uniform>();
     }
 
     public compileShaders(gl: WebGL2RenderingContext) {
@@ -60,8 +63,10 @@ export class Shader {
         gl.useProgram(this.programShader);
     }
 
-    public initShaderValues(gl: WebGL2RenderingContext, canvas) {
-        const shaderData = ShaderUtils.parseShaderData(gl, this);
+    public initShaderValues(gl: WebGL2RenderingContext, canvas: HTMLCanvasElement) {
+        const shaderData = ShaderUtils.parseShaderData(gl, this, this.programShader, canvas);
+        console.log(shaderData);
+        this.shaderUniforms = [...this.shaderUniforms,...shaderData];
 
         this.uniforms.time = {
             location: gl.getUniformLocation(this.programShader, 'time'),
@@ -104,28 +109,24 @@ export class Shader {
             location: gl.getUniformLocation(this.programShader, 'fogColor'),
             value: [1.7, 0.8, 1.0]
         };
-        console.log(this.uniforms.fogColor);
         gl.uniform3fv(this.uniforms.fogColor.location, this.uniforms.fogColor.value);
 
         this.uniforms.camera = {
             location: gl.getUniformLocation(this.programShader, 'camera'),
             value: [4.0, 2.0, 4.0]
         };
-        console.log(this.uniforms.camera);
         gl.uniform3fv(this.uniforms.camera.location, this.uniforms.camera.value);
 
         this.uniforms.sphere = {
             location: gl.getUniformLocation(this.programShader, 'sphere'),
             value: [0.5, 0.5, 0.1]
         };
-        console.log(this.uniforms.sphere);
         gl.uniform3fv(this.uniforms.sphere.location, this.uniforms.sphere.value);
 
         this.uniforms.mouse = {
             location: gl.getUniformLocation(this.programShader, 'mouse'),
             value: [1.0, 3.0]
         };
-        console.log(this.uniforms.mouse);
         gl.uniform2fv(this.uniforms.mouse.location, this.uniforms.mouse.value);
 
         this.uniforms.gamma = {

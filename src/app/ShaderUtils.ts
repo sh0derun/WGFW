@@ -1,30 +1,45 @@
 import { Shader } from './Shader';
+import { Uniform } from './models/uniform';
 export default class ShaderUtils {
-    static UNIFORM_TYPES = {FLOAT: 'float', VEC2: 'vec2', VEC3: 'vec3', BOOL: 'bool'};
+    static UNIFORM_TYPES = {FLOAT: 'float', VEC2: 'vec2', VEC3: 'vec3', BOOL: 'bool', STRUCT: 'struct'};
 
     static SHADER_DATA_TYPES = {UNFORM: 'uniform', ATTRIBUT: 'attribut'};
 
-    public static parseShaderData(gl: WebGL2RenderingContext, shaderClass: Shader) {
-        const shaderData = this.loadJSON('../assets/shaders/shader_data/uniforms.json');
-        console.log(shaderData);
-        if (shaderData.uniforms) {
-            shaderData.uniforms.forEach(uniform => {
+    public static parseShaderData(gl: WebGL2RenderingContext, shaderClass: Shader, programShader: WebGLProgram, canvas: HTMLCanvasElement): Uniform[] {
+        const uniforms: Uniform[] = this.loadJSON('../assets/shaders/shader_data/uniforms.json');
+        if (uniforms) {
+            uniforms.forEach(uniform => {
+                const location: WebGLUniformLocation = gl.getUniformLocation(programShader, uniform.name);
+                uniform.location = location;
                 switch (uniform.type) {
-                    case this.UNIFORM_TYPES.FLOAT:
-                        console.log('uniform1f');
+                    case this.UNIFORM_TYPES.FLOAT || this.UNIFORM_TYPES.BOOL:
+                        gl.uniform1f(location, <number>uniform.value);
                         break;
                     case this.UNIFORM_TYPES.VEC2:
-                        console.log('uniform2f');
+                        if (uniform.name === 'resolution') {
+                            uniform.value = [canvas.width, canvas.height];
+                        }
+                        else if (uniform.name === 'screenRatio') {
+                            const mx: number = Math.max(canvas.width, canvas.height);
+                            uniform.value = [canvas.width / mx, canvas.height / mx];
+                        }
+                        gl.uniform2fv(location, <number[]>uniform.value);
                         break;
                     case this.UNIFORM_TYPES.VEC3:
-                        console.log('uniform3fv');
+                        gl.uniform3fv(location, <number[]>uniform.value);
                         break;
-                    case this.UNIFORM_TYPES.BOOL:
-                        console.log('uniform1f');
+                    case this.UNIFORM_TYPES.STRUCT:
+                        uniform.location = Array<WebGLUniformLocation>();
+                        let index: number = 0;
+                        for(let field of uniform.fields){
+                            (<WebGLUniformLocation[]>(uniform.location)).push(gl.getUniformLocation(programShader, uniform.name+'.'+field));
+                            gl.uniform1f(uniform.location[(<WebGLUniformLocation[]>(uniform.location)).length], uniform.value[index++]);
+                        }
                         break;
                 }
             });
         }
+        return uniforms;
     }
 
     public static combineShader(shader: string): string {
