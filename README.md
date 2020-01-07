@@ -14,6 +14,16 @@ GUIs are implemented using dat.gui library.
 
 **Disclaimer : _Only modern browsers that supports webgl2 can run this project !_**
 
+## Useful links:
+Those are some resources in which i spent time to implement all 3d computer graphics theories.
+* [Sphere Tracing: A Geometric Method for the Antialiased Ray Tracing of Implicit Surfaces by John C. Hart](http://mathinfo.univ-reims.fr/IMG/pdf/hart94sphere.pdf)
+* [Enhanced Sphere Tracing by Benjamin Keinert, Henry F Schaefer, Johann Korndörfer, Urs Ganse, Marc Stamminger](https://pdfs.semanticscholar.org/4c9b/d91bd044980f5746d623315be5285cc799c9.pdf)
+* [Procedural modeling with signed distance functions by  Carl Lorenz Diener](http://aka-san.halcy.de/thesis.pdf)
+* [Modeling with distance functions by Inigo Quilez](http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm)
+* [Free penumbra shadows for raymarching distance fields by Inigo Quilez](http://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm)
+* [Smooth minimum by Inigo Quilez](http://www.iquilezles.org/www/articles/smin/smin.htm)
+
+## Screneshots:
 those are some screenshots of some running demos:
 
 ![wgfw1](images/wgfw1.PNG)
