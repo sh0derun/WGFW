@@ -13,5 +13,5 @@
     "showDisplacements": { "type": "bool", "name": "showDisplacements", "value": 0, "location": null, "lerp": 1.0},
     "phongShading": { "type": "bool", "name": "phongShading", "value": 0, "location": null, "lerp": 1.0},
     "pbrShading": { "type": "bool", "name": "pbrShading", "value": 0, "location": null, "lerp": 1.0},
-    "textureData": { "type": "struct", "name": "textureData", "fields": ["thickness","frequency","amplitude"], "value": [0.1,0.2,0.3], "location": [], "lerp": [1.0,1.0,1.0]}
+    "textureData": { "type": "struct", "name": "textureData", "fields": ["thickness","frequency","amplitude"], "value": [0.1,0.2,0.3], "location": [], "lerp": [0.05,0.05,0.05]}
 }

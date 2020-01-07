@@ -144,7 +144,7 @@ export class WGFWAnimator {
         };
         const newRangeMouse: number[] = [];
         for (let i = 0; i < mouse.length; i++) {
-            newRangeMouse[i] = mapRange([this.canvas.width, this.canvas.height], [-5, 1], mouse[i]);
+            newRangeMouse[i] = mapRange([this.canvas.width, this.canvas.height], [-1, 1], mouse[i]);
         }
         return newRangeMouse;
     }
@@ -162,130 +162,71 @@ export class WGFWAnimator {
     }
 
     public initRenderingLoop(): void {
-        const requestAnimFrame = 'requestAnimFrame';
-        const mozRequestAnimationFrame = 'mozRequestAnimationFrame';
-        const oRequestAnimationFrame = 'oRequestAnimationFrame';
-        const msRequestAnimationFrame = 'msRequestAnimationFrame';
-        window[requestAnimFrame] = (() => {
+        window['requestAnimFrame'] = (() => {
             return window.requestAnimationFrame ||
                 window.webkitRequestAnimationFrame ||
-                window[mozRequestAnimationFrame] ||
-                window[oRequestAnimationFrame] ||
-                window[msRequestAnimationFrame] ||
-                function(callback, element){
-                    return window.setTimeout(callback, 1000 / 60);
-                };
+                window['mozRequestAnimationFrame'] ||
+                window['oRequestAnimationFrame'] ||
+                window['msRequestAnimationFrame'] || ((callback, element) => window.setTimeout(callback, 1000 / 60));
         })();
-        const cancelRequestAnimFrame = 'cancelRequestAnimFrame';
-        const mozCancelRequestAnimationFrame = 'mozCancelRequestAnimationFrame';
-        const oCancelRequestAnimationFrame = 'oCancelRequestAnimationFrame';
-        const msCancelRequestAnimationFrame = 'msCancelRequestAnimationFrame';
-        window[cancelRequestAnimFrame] = (() => {
+        window['cancelRequestAnimFrame'] = (() => {
             return window.cancelAnimationFrame ||
                 window.webkitCancelAnimationFrame ||
-                window[mozCancelRequestAnimationFrame] ||
-                window[oCancelRequestAnimationFrame] ||
-                window[msCancelRequestAnimationFrame] ||
+                window['mozCancelRequestAnimationFrame'] ||
+                window['oCancelRequestAnimationFrame'] ||
+                window['msCancelRequestAnimationFrame'] ||
                 window.clearTimeout;
         })();
     }
 
     private updateUniformsValues(): void {
-        this.shader.uniforms.time.value += 0.01;
-        this.shader.uniforms.speed.value = this.lerp(this.shader.uniforms.speed.value, this.guiData.speed, 1.0);
-        this.shader.uniforms.fogAmount.value = this.lerp(this.shader.uniforms.fogAmount.value, this.guiData.fogAmount, 1.0);
-        this.shader.uniforms.gamma.value = this.lerp(this.shader.uniforms.gamma.value, this.guiData.gamma, 0.5);
-        this.shader.uniforms.overRelaxation.value = +this.guiData.overRelaxation;
-        this.shader.uniforms.showDisplacements.value = +this.guiData.showDisplacements;
-        this.shader.uniforms.phongShading.value = +this.guiData.phongShading;
-        this.shader.uniforms.pbrShading.value = +this.guiData.pbrShading;
-        this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.01);
-        this.shader.uniforms.sphere.value = this.nlerp(this.shader.uniforms.sphere.value, Object.values(this.guiData.sphere), 0.5);
-        this.shader.uniforms.textureData.value.thickness = this.lerp(this.shader.uniforms.textureData.value.thickness,
-                                                                     this.textureData.thickness, 1.0);
-        this.shader.uniforms.textureData.value.frequency = this.lerp(this.shader.uniforms.textureData.value.frequency,
-                                                                     this.textureData.frequency, 1.0);
-        this.shader.uniforms.textureData.value.amplitude = this.lerp(this.shader.uniforms.textureData.value.amplitude,
-                                                                     this.textureData.amplitude, 1.0);
+        this.shader.shaderUniforms.time.value = <number> this.shader.shaderUniforms.time.value + 0.01;
+        this.shader.shaderUniforms.speed.value = this.lerp(<number> this.shader.shaderUniforms.speed.value, this.guiData.speed, 1.0);
+        this.shader.shaderUniforms.fogAmount.value = this.lerp(<number> this.shader.shaderUniforms.fogAmount.value, this.guiData.fogAmount, 1.0);
+        this.shader.shaderUniforms.gamma.value = this.lerp(<number> this.shader.shaderUniforms.gamma.value, this.guiData.gamma, 0.5);
+        this.shader.shaderUniforms.overRelaxation.value = +this.guiData.overRelaxation;
+        this.shader.shaderUniforms.showDisplacements.value = +this.guiData.showDisplacements;
+        this.shader.shaderUniforms.phongShading.value = +this.guiData.phongShading;
+        this.shader.shaderUniforms.pbrShading.value = +this.guiData.pbrShading;
+        this.shader.shaderUniforms.camera.value = this.nlerp(<number[]> this.shader.shaderUniforms.camera.value, Object.values(this.guiData.camera), 0.01);
+        this.shader.shaderUniforms.sphere.value = this.nlerp(<number[]> this.shader.shaderUniforms.sphere.value, Object.values(this.guiData.sphere), 0.5);
+
+        const texdata: number[] = Object.values(this.textureData);
+        for (let i = 0; i < (<number[]> this.shader.shaderUniforms.textureData.value).length; i++) {
+            this.shader.shaderUniforms.textureData.value[i] = this.lerp(this.shader.shaderUniforms.textureData.value[i], texdata[i], this.shader.shaderUniforms.textureData.lerp[i]);
+        }
     }
 
     public render(): void {
         if (!this.guiData.pause) {
             const elapsedtime: number = (Date.now() - this.start) / 1000.0;
-            //console.log(0.01/elapsedtime);
-            const framespeed = 1.0;
+            this.fps = 1 / elapsedtime;
 
-            this.shader.shaderUniforms.forEach(uniform => {
+            this.updateUniformsValues();
+
+            Object.values(this.shader.shaderUniforms).forEach(uniform => {
                 switch (uniform.type) {
-                    case ShaderUtils.UNIFORM_TYPES.FLOAT || ShaderUtils.UNIFORM_TYPES.BOOL:
-                        this.gl.uniform1f(location, <number>uniform.value);
+                    case ShaderUtils.UNIFORM_TYPES.FLOAT:
+                        this.gl.uniform1f(uniform.location, <number> uniform.value);
                         break;
                     case ShaderUtils.UNIFORM_TYPES.VEC2:
-                        this.gl.uniform2fv(location, <number[]>uniform.value);
+                        this.gl.uniform2fv(uniform.location, <number[]> uniform.value);
                         break;
                     case ShaderUtils.UNIFORM_TYPES.VEC3:
-                        this.gl.uniform3fv(location, <number[]>uniform.value);
+                        this.gl.uniform3fv(uniform.location, <number[]> uniform.value);
                         break;
                     case ShaderUtils.UNIFORM_TYPES.STRUCT:
-                        let index: number = 0;
-                        for(let field of uniform.fields){
-                            this.gl.uniform1f(uniform.location[(<WebGLUniformLocation[]>(uniform.location)).length], uniform.value[index++]);
+                        for (let i = 0; i < (<number[]> uniform.value).length; i++) {
+                            this.gl.uniform1f(uniform.location[i], uniform.value[i]);
                         }
+                        break;
+                    case ShaderUtils.UNIFORM_TYPES.BOOL:
+                        this.gl.uniform1f(uniform.location, <number> uniform.value);
                         break;
                 }
             });
 
-            this.shader.uniforms.time.value += 0.01;
-            this.gl.uniform1f(this.shader.uniforms.time.location, this.shader.uniforms.time.value);
-
-            this.shader.uniforms.speed.value = this.lerp(this.shader.uniforms.speed.value, this.guiData.speed, 1.0);
-            this.gl.uniform1f(this.shader.uniforms.speed.location, this.shader.uniforms.speed.value);
-
-            this.shader.uniforms.fogAmount.value = this.lerp(this.shader.uniforms.fogAmount.value, this.guiData.fogAmount, 1.0);
-            this.gl.uniform1f(this.shader.uniforms.fogAmount.location, this.shader.uniforms.fogAmount.value);
-
-            this.shader.uniforms.gamma.value = this.lerp(this.shader.uniforms.gamma.value, this.guiData.gamma, 0.5);
-            this.gl.uniform1f(this.shader.uniforms.gamma.location, this.shader.uniforms.gamma.value);
-
-            this.shader.uniforms.overRelaxation.value = +this.guiData.overRelaxation;
-            this.gl.uniform1f(this.shader.uniforms.overRelaxation.location, this.shader.uniforms.overRelaxation.value);
-
-            this.shader.uniforms.showDisplacements.value = +this.guiData.showDisplacements;
-            this.gl.uniform1f(this.shader.uniforms.showDisplacements.location, this.shader.uniforms.showDisplacements.value);
-
-            this.shader.uniforms.phongShading.value = +this.guiData.phongShading;
-            this.gl.uniform1f(this.shader.uniforms.phongShading.location, this.shader.uniforms.phongShading.value);
-
-            this.shader.uniforms.pbrShading.value = +this.guiData.pbrShading;
-            this.gl.uniform1f(this.shader.uniforms.pbrShading.location, this.shader.uniforms.pbrShading.value);
-
-            this.shader.uniforms.camera.value = this.nlerp(this.shader.uniforms.camera.value, Object.values(this.guiData.camera), 0.01);
-            this.gl.uniform3fv(this.shader.uniforms.camera.location, this.shader.uniforms.camera.value);
-
-            this.shader.uniforms.sphere.value = this.nlerp(this.shader.uniforms.sphere.value, Object.values(this.guiData.sphere), 0.5);
-            this.gl.uniform3fv(this.shader.uniforms.sphere.location, this.shader.uniforms.sphere.value);
-
-            this.shader.uniforms.textureData.value.thickness = this.lerp(this.shader.uniforms.textureData.value.thickness,
-                                                                         this.textureData.thickness, 1.0);
-            this.gl.uniform1f(this.shader.uniforms.textureData.location.thickness, this.shader.uniforms.textureData.value.thickness);
-
-            this.shader.uniforms.textureData.value.frequency = this.lerp(this.shader.uniforms.textureData.value.frequency,
-                                                                         this.textureData.frequency, 1.0);
-            this.gl.uniform1f(this.shader.uniforms.textureData.location.frequency, this.shader.uniforms.textureData.value.frequency);
-
-            this.shader.uniforms.textureData.value.amplitude = this.lerp(this.shader.uniforms.textureData.value.amplitude,
-                                                                         this.textureData.amplitude, 1.0);
-            this.gl.uniform1f(this.shader.uniforms.textureData.location.amplitude, this.shader.uniforms.textureData.value.amplitude);
-
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-
-            this.fps++;
-
-            this.fpstime += elapsedtime;
-            if (this.fpstime >= 1.0) {
-                this.fpstime -= 1.0;
-                this.fps = 0;
-            }
 
             this.start = Date.now();
 

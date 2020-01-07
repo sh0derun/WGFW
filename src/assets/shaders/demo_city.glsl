@@ -30,9 +30,9 @@ void main( void ){
     uv.x *= resolution.x/resolution.y;
 
     //outColor = vec4(fbm(speed*4.0*vec3(uv,0.0)));return;
-
+    
     float tm = time;
-    O = vec3(0.0,2.0,3.0)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),3.0*noise(tm*1.4),3.0*noise(tm*1.7));//vec3(camera.x*cos(tm*0.1)*speed,camera.y,camera.z*sin(tm*0.1)*speed)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),0.0,3.0*noise(tm*1.7));
+    O = vec3(0.0,2.0,3.0);//+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),3.0*noise(tm*1.4),3.0*noise(tm*1.7));//vec3(camera.x*cos(tm*0.1)*speed,camera.y,camera.z*sin(tm*0.1)*speed)+3.5*sin(tm)*vec3(3.0*noise(tm*1.4),0.0,3.0*noise(tm*1.7));
     Ot = vec3(camera.x*cos(tm),camera.y,camera.z*sin(tm))+1.5*sin(tm)*vec3(2.0*noise(tm*1.4),0.0,2.0*noise(tm*1.7));
     vec3 camTar = vec3(0.0,0.0,0.0);
     vec3 camDir = normalize(camTar - O);
