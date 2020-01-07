@@ -25,14 +25,6 @@
             ],
             "styles": [
               "src/styles.css"
-            ],
-            "scripts": [
-              "src/assets/wgfw.js",
-              "src/assets/shaderutil.js",
-              "src/assets/shader.js",
-              "src/assets/recorder.js",
-              "src/assets/animation.js",
-              "src/assets/dat.gui.min.js"
             ]
           },
           "configurations": {
