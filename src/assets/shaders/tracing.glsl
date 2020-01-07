@@ -50,8 +50,8 @@ void main( void ){
         N = normal(P);
         col += kc * vec3(1.0)*dirlight(normalize(vec3(1.0)))*vec3(0.3,0.3,0.9);
         col += kc * vec3(1.0)*dirlight(normalize(vec3(-1.0,1.0,1.0)))*vec3(0.8,0.3,0.1);
-        O = P + D * 2.0* speed;
-                //O = P + D * 0.01;
+        //O = P + D * 2.0* speed;
+                O = P + D * 0.01;
                 D = refract(D, N, 1.0/1.333);
     }
     outColor = vec4(sqrt(col),1.0);

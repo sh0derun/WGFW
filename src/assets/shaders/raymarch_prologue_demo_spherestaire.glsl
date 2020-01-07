@@ -162,7 +162,7 @@ vec2 sdf(vec3 p){
     vec3 q = p;
     q *= rotateY(time);
     vec2 sphere = vec2(sp(q, 4.0),1.0);
-    float mountain = clamp(1.0 - noise(q * /*(sin(time)*0.5+0.5)*/ 2.5) + (max(abs(q.y) - 1.0, 0.0)) * 0.03, 0.0, 1.0);
+    float mountain = clamp(1.0 - noise(q * /*(sin(time)*0.5+0.5)*/ speed) + (max(abs(q.y) - 1.0, 0.0)) * 0.03, 0.0, 1.0);
     mountain = (mountain*mountain*mountain) * 0.25 + 0.8;
     sphere.x += mountain;
     sphere.x *= 0.6;

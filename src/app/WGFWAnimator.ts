@@ -107,14 +107,14 @@ export class WGFWAnimator {
     }
 
     private onMouseMove(event): void {
-        const uniform: Uniform = this.shader.shaderUniforms['mouse'];
+        const uniform: Uniform = this.shader.shaderUniforms.mouse;
         this.guiData.mouse = [event.clientX, event.clientY];
         uniform.value = [...this.mappingMouseCoords(this.guiData.mouse)];
         this.gl.uniform2fv(uniform.location, uniform.value);
     }
 
     private onChangeFogColor(): void {
-        const uniform: Uniform = this.shader.shaderUniforms['fogColor'];
+        const uniform: Uniform = this.shader.shaderUniforms.fogColor;
         uniform.value = [...this.mappingColor(this.guiData.fogColor)];
         this.gl.uniform3fv(uniform.location, uniform.value);
     }
