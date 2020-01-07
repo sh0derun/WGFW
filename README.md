@@ -8,6 +8,8 @@ Coders can find in the glsl library lot of utility functions that allow coders t
 
 There is a rish list of materials in a glsl file that can be used when shading te scene. Note that currently, their is two shading techniques that were already implemented namely Phong Shading and Physically Based Rendering Shading(pbr).
 
+GUIs are implemented using dat.gui library.
+
 **Disclaimer : _Only modern browsers that supports webgl2 can run this project !_**
 
 those are some screenshots of some running demos:
