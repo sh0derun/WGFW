@@ -32,7 +32,7 @@ export class WgfwDirective implements OnInit {
     }
 
     constructor(el: ElementRef) {
-        if (el.nativeElement !== null && el.nativeElement.tagName === 'CANVAS') {
+        if (el.nativeElement !== null) {
             this.el = el;
         }
     }
