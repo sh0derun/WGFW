@@ -1,5 +1,7 @@
 # WGFW
 
+[![Build Status](https://travis-ci.org/sh0derun/WGFW.svg?branch=master)](https://travis-ci.org/sh0derun/WGFW)
+
 This project is about an angular directive that allow creative coders and shader coders to code theirs 3D scenes using the famous sphere tracing rendering technique. 
 
 The only thing that the coders needs to do is implementing the distance function of the scene that he wants to render, and specify material identifier of each object in order to shade objects in a unique way.
@@ -16,8 +18,8 @@ those are some screenshots of some running demos:
 
 ![wgfw1](images/wgfw1.PNG)
 
-![wgfw1](images/wgfw2.PNG)
+![wgfw2](images/wgfw2.PNG)
 
-![wgfw1](images/wgfw3.PNG)
+![wgfw3](images/wgfw3.PNG)
 
-![wgfw1](images/wgfw4.PNG)
+![wgfw3](images/wgfw4.PNG)
