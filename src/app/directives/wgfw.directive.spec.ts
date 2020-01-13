@@ -5,7 +5,7 @@ import { WgfwDirective } from './wgfw.directive';
 
 describe('Directive: Wgfw', () => {
   it('should create an instance', () => {
-    let templateRef = jasmine.createSpyObj("TemplateRef", [""]);
+    const templateRef = jasmine.createSpyObj('TemplateRef', ['']);
     const directive = new WgfwDirective(templateRef);
     expect(directive).toBeTruthy();
   });

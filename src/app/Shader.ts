@@ -6,13 +6,11 @@ export class Shader {
 
     vertexShaderSource: string;
     fragShaderSource: string;
-    vertexShader: any;
-    fragmentShader: any;
-    programShader: any;
-    uniforms: any;
-    attributs: any;
-
+    vertexShader: WebGLShader;
+    fragmentShader: WebGLShader;
+    programShader: WebGLProgram;
     shaderUniforms: {[key: string]: Uniform};
+    attributs: any;
 
     constructor(vertexSource: string, fragmentSource: string) {
         this.vertexShaderSource = ShaderUtils.loadShaderSource(vertexSource);
@@ -20,7 +18,6 @@ export class Shader {
         this.vertexShader = null;
         this.fragmentShader = null;
         this.programShader = null;
-        this.uniforms = {};
         this.attributs = {};
         this.shaderUniforms = {};
     }

@@ -8,19 +8,19 @@ export class WGFWAnimator {
     start: number;
     fps: number;
     fpstime: number;
-    gl: any;
+    gl: WebGL2RenderingContext;
     shader: Shader;
-    canvas: any;
+    canvas: HTMLCanvasElement;
 
     guiData: any;
     textureData: any;
-    texControls: any;
-    guiControls: any;
-    cameraFolder: any;
-    sphereFolder: any;
-    fogFolder: any;
+    texControls: GUI;
+    guiControls: GUI;
+    cameraFolder: GUI;
+    sphereFolder: GUI;
+    fogFolder: GUI;
 
-    constructor(gl: any, shader: Shader, canvas: any) {
+    constructor(gl: WebGL2RenderingContext, shader: Shader, canvas: HTMLCanvasElement) {
         this.start = 0.0;
         this.fps = 0;
         this.fpstime = 0.0;
@@ -110,13 +110,13 @@ export class WGFWAnimator {
         const uniform: Uniform = this.shader.shaderUniforms.mouse;
         this.guiData.mouse = [event.clientX, event.clientY];
         uniform.value = [...this.mappingMouseCoords(this.guiData.mouse)];
-        this.gl.uniform2fv(uniform.location, uniform.value);
+        this.gl.uniform2fv(uniform.location, <number[]> uniform.value);
     }
 
     private onChangeFogColor(): void {
         const uniform: Uniform = this.shader.shaderUniforms.fogColor;
         uniform.value = [...this.mappingColor(this.guiData.fogColor)];
-        this.gl.uniform3fv(uniform.location, uniform.value);
+        this.gl.uniform3fv(uniform.location, <number[]> uniform.value);
     }
 
     private onChangeValue(e): void {
@@ -126,25 +126,22 @@ export class WGFWAnimator {
     private saveCanvasFile(): void {
 
     }
+    private mapRange(from: number[], to: number[], valueToMap: number): number {
+        return to[0] + (valueToMap - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
+    }
 
     private mappingColor(color: number[]): number[] {
-        const mapRange = (from, to, s) => {
-            return to[0] + (s - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
-        };
         const newRangeColor: number[] = [];
         for (let i = 0; i < color.length; i++) {
-            newRangeColor[i] = mapRange([0, 255], [0, 1], color[i]);
+            newRangeColor[i] = this.mapRange([0, 255], [0, 1], color[i]);
         }
         return newRangeColor;
     }
 
     private mappingMouseCoords(mouse: number[]): number[] {
-        const mapRange = (from, to, s) => {
-            return to[0] + (s - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
-        };
         const newRangeMouse: number[] = [];
         for (let i = 0; i < mouse.length; i++) {
-            newRangeMouse[i] = mapRange([this.canvas.width, this.canvas.height], [-1, 1], mouse[i]);
+            newRangeMouse[i] = this.mapRange([this.canvas.width, this.canvas.height], [-1, 1], mouse[i]);
         }
         return newRangeMouse;
     }
