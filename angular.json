@@ -25,6 +25,9 @@
             ],
             "styles": [
               "src/styles.css"
+            ],
+            "scripts": [
+              "src/assets/timeliner.js"
             ]
           },
           "configurations": {
@@ -85,7 +88,9 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/timeliner.js"
+            ]
           }
         },
         "lint": {

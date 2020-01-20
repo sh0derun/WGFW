@@ -1,6 +1,6 @@
 import { WGFWAnimator } from '../WGFWAnimator';
 import { Shader } from './../Shader';
-import { Directive, ElementRef, Input, OnInit } from '@angular/core';
+import { Directive, ElementRef, Input, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Directive({
     selector: '[wgfw]'
@@ -18,6 +18,8 @@ export class WgfwDirective implements OnInit {
     shader: Shader;
     animator: WGFWAnimator;
 
+    @Output() fpsEmitter: EventEmitter<number> = new EventEmitter<number>();
+
     ngOnInit() {
         this.initWebglContext(this.el);
         this.shader = new Shader(this.vertexShaderLocation, this.fragmentShaderLocation);
@@ -29,12 +31,20 @@ export class WgfwDirective implements OnInit {
         this.animator = new WGFWAnimator(this.canvasContext, this.shader, this.el.nativeElement);
         this.animator.initRenderingLoop();
         this.animator.render();
+
+        this.loop();
     }
 
     constructor(el: ElementRef) {
         if (el.nativeElement !== null) {
             this.el = el;
         }
+        
+    }
+
+    private loop(){
+        this.fpsEmitter.emit(Math.floor(this.animator.fps));
+        requestAnimationFrame(this.loop.bind(this));
     }
 
     private initWebglContext(el: ElementRef): void {

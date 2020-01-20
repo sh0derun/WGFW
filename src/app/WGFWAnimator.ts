@@ -196,8 +196,8 @@ export class WGFWAnimator {
 
     public render(): void {
         if (!this.guiData.pause) {
-            const elapsedtime: number = (Date.now() - this.start) / 1000.0;
-            this.fps = 1 / elapsedtime;
+            const elapsedtime: number = (performance.now() - this.start) / 1000.0;
+            this.fps = this.lerp(this.fps, 1 / elapsedtime, 0.1);
 
             this.updateUniformsValues();
 
@@ -225,7 +225,7 @@ export class WGFWAnimator {
 
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 
-            this.start = Date.now();
+            this.start = performance.now();
 
             window.requestAnimationFrame(this.render.bind(this));
         }
