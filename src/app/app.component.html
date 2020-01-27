@@ -1,6 +1,6 @@
 <div id="texgui"></div>
-<h3 style="color: white;">FPS:{{this.fps}}</h3>
+<!--<h3 style="color: white;">FPS:{{this.fps}}</h3>-->
 <canvas wgfw [fullScreen]="false"
-             [w]="900" [h]="700" 
+             [w]="500" [h]="500" 
              [vertexShaderLocation]="'../assets/shaders/vertexshader.glsl'" [fragmentShaderLocation]="'../assets/shaders/demo_city.glsl'"
              (fpsEmitter)="getFps($event)"></canvas>

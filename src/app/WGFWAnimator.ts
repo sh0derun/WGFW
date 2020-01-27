@@ -2,6 +2,7 @@ import { Shader } from './Shader';
 import { GUI } from 'dat.gui';
 import ShaderUtils from './ShaderUtils';
 import { Uniform } from './models/uniform';
+import { WGFWTimeliner } from './WGFWTimeliner';
 
 export class WGFWAnimator {
 
@@ -11,6 +12,7 @@ export class WGFWAnimator {
     gl: WebGL2RenderingContext;
     shader: Shader;
     canvas: HTMLCanvasElement;
+    timeliner: WGFWTimeliner;
 
     guiData: any;
     textureData: any;
@@ -28,7 +30,10 @@ export class WGFWAnimator {
         this.shader = shader;
         this.canvas = canvas;
 
+        this.timeliner = new WGFWTimeliner(this.gl, this.shader);
+
         this.guiData = {
+            fps: '0',
             speed: 0.1,
             fogAmount: 0.0,
             fogColor: [0.1, 0, 0],
@@ -62,6 +67,7 @@ export class WGFWAnimator {
         this.texControls.add(this.textureData, 'amplitude', 0.01, 5.0, 0.01);
 
         this.guiControls = new GUI({name: 'Animation Data'});
+        this.guiControls.add(this.guiData, 'fps');
         this.guiControls.add(this.guiData, 'speed', -5.0, 5.0, 0.001);
 
         this.cameraFolder = this.guiControls.addFolder('Camera');
@@ -198,7 +204,7 @@ export class WGFWAnimator {
         if (!this.guiData.pause) {
             const elapsedtime: number = (performance.now() - this.start) / 1000.0;
             this.fps = this.lerp(this.fps, 1 / elapsedtime, 0.1);
-
+            this.guiData.fps = this.fps;
             this.updateUniformsValues();
 
             Object.values(this.shader.shaderUniforms).forEach(uniform => {

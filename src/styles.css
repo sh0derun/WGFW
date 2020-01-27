@@ -10,3 +10,9 @@ canvas{
 div#texgui{
 	margin:0%;
 }
+li[class="cr string"] > div > span[class=property-name]{
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
