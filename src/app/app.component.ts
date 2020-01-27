@@ -9,8 +9,7 @@ export class AppComponent implements OnInit{
 
   public fps: number;
 
-  ngOnInit(){
-    
+  ngOnInit() {
   }
 
   public getFps(event){

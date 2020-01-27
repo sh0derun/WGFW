@@ -182,8 +182,8 @@ export class WGFWAnimator {
         })();
     }
 
-    private updateUniformsValues(): void {
-        this.shader.shaderUniforms.time.value = <number> this.shader.shaderUniforms.time.value + 0.01;
+    private updateUniformsValues(elapsedTime: number): void {
+        this.shader.shaderUniforms.time.value = <number> this.shader.shaderUniforms.time.value + elapsedTime;
         this.shader.shaderUniforms.speed.value = this.lerp(<number> this.shader.shaderUniforms.speed.value, this.guiData.speed, 1.0);
         this.shader.shaderUniforms.fogAmount.value = this.lerp(<number> this.shader.shaderUniforms.fogAmount.value, this.guiData.fogAmount, 1.0);
         this.shader.shaderUniforms.gamma.value = this.lerp(<number> this.shader.shaderUniforms.gamma.value, this.guiData.gamma, 0.5);
@@ -205,7 +205,7 @@ export class WGFWAnimator {
             const elapsedtime: number = (performance.now() - this.start) / 1000.0;
             this.fps = this.lerp(this.fps, 1 / elapsedtime, 0.1);
             this.guiData.fps = this.fps;
-            this.updateUniformsValues();
+            this.updateUniformsValues(elapsedtime);
 
             Object.values(this.shader.shaderUniforms).forEach(uniform => {
                 switch (uniform.type) {
