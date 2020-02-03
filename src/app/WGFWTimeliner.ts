@@ -27,9 +27,6 @@ export class WGFWTimeliner {
         this.timelinerCanvas.addEventListener('mousedown', (event) => {
             if (Math.sqrt(Math.pow(this.scroller.x - event.offsetX, 2) + Math.pow(this.scroller.y - event.offsetY, 2)) <= this.scroller.radius) {
                 this.scroller.clicked = true;
-            } else {
-                shader.shaderUniforms.time.value = event.offsetX / 100;
-                this.scroller.x = <number> shader.shaderUniforms.time.value * 100;
             }
         });
         this.timelinerCanvas.addEventListener('mouseup', (event) => {
@@ -38,6 +35,7 @@ export class WGFWTimeliner {
         this.timelinerCanvas.addEventListener('mousemove', (event) => {
             if (this.scroller.clicked) {
                 shader.shaderUniforms.time.value = event.offsetX / 100;
+                this.scroller.x = shader.shaderUniforms.time.value;
             }
         });
         this.loop(this.gl, this.shader, this.timelinerCanvas);
@@ -50,6 +48,10 @@ export class WGFWTimeliner {
 
         const timeString: string[] = ((<number> shader.shaderUniforms.time.value).toFixed(2) + '').split('.');
         const outTime: string = timeString[0] + ':' + timeString[1];
+
+        if(this.scroller.x >= canvas.width){
+            shader.shaderUniforms.time.value = 0;
+        }
 
         this.scroller.x = <number> shader.shaderUniforms.time.value * 100;
         this.scroller.y = 20;
