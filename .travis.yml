@@ -8,12 +8,6 @@ node_js:
 addons:
   update: true
   chrome: stable
-  apt:
-    sources:
-      - google-chrome
-    packages:
-      - dpkg
-      - google-chrome-stable
 
 cache:
   directories:
