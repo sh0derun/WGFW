@@ -13,5 +13,7 @@
     "showDisplacements": { "type": "bool", "name": "showDisplacements", "value": 0, "location": null, "lerp": 1.0},
     "phongShading": { "type": "bool", "name": "phongShading", "value": 0, "location": null, "lerp": 1.0},
     "pbrShading": { "type": "bool", "name": "pbrShading", "value": 0, "location": null, "lerp": 1.0},
-    "textureData": { "type": "struct", "name": "textureData", "fields": ["thickness","frequency","amplitude"], "value": [0.1,0.2,0.3], "location": [], "lerp": [0.05,0.05,0.05]}
+    "uao": { "type": "struct", "name": "uao", "fields": ["enabled","depth"], "value": [0,1], "types":["bool", "int"], "location": [], "lerp": [0.05,0.05]},
+    "textureData": { "type": "struct", "name": "textureData", "fields": ["thickness","frequency","amplitude"], "value": [0.1,0.2,0.3], "types":["float", "float", "float"], "location": [], "lerp": [0.05,0.05,0.05]},
+    "noisetex": { "type": "sampler_2d", "name": "noisetex", "value": 0, "location": null, "lerp": 1.0}
 }

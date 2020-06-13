@@ -5,4 +5,5 @@ export class Uniform {
     public location: WebGLUniformLocation | WebGLUniformLocation[];
     public lerp: number | number[];
     public fields?: string[];
+    public types?: string[];
 }

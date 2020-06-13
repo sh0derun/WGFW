@@ -1,11 +1,12 @@
 import { Shader } from './Shader';
 import { Uniform } from './models/uniform';
 export default class ShaderUtils {
-    static UNIFORM_TYPES = {FLOAT: 'float', VEC2: 'vec2', VEC3: 'vec3', BOOL: 'bool', STRUCT: 'struct'};
+    static UNIFORM_TYPES = {INT: 'int', FLOAT: 'float', VEC2: 'vec2', VEC3: 'vec3', BOOL: 'bool', STRUCT: 'struct', SAMPLER_2D: 'sampler_2d'};
 
     static SHADER_DATA_TYPES = {UNFORM: 'uniform', ATTRIBUT: 'attribut'};
 
     public static parseShaderData(gl: WebGL2RenderingContext, shaderClass: Shader, programShader: WebGLProgram, canvas: HTMLCanvasElement): {[key: string]: Uniform} {
+        gl.useProgram(programShader);
         const uniforms: {[key: string]: Uniform} = this.loadJSON('../assets/shaders/shader_data/uniforms.json');
         if (uniforms) {
             const uniformsValues: Uniform[] = <Uniform[]> Object.values(uniforms);
@@ -33,12 +34,23 @@ export default class ShaderUtils {
                         let index = 0;
                         for (const field of uniform.fields) {
                             (<WebGLUniformLocation[]> (uniform.location)).push(gl.getUniformLocation(programShader, uniform.name + '.' + field));
-                            gl.uniform1f(uniform.location[(<WebGLUniformLocation[]> (uniform.location)).length - 1], uniform.value[index++]);
+                            if (uniform.types[index] === this.UNIFORM_TYPES.INT) {
+                                gl.uniform1i(uniform.location[(<WebGLUniformLocation[]> (uniform.location)).length - 1], <number> uniform.value[index++]);
+                            } else {
+                                gl.uniform1f(uniform.location[(<WebGLUniformLocation[]> (uniform.location)).length - 1], <number> uniform.value[index++]);
+                            }
                         }
+                        break;
+                    case this.UNIFORM_TYPES.SAMPLER_2D:
+                        const texture = this.loadTexture(gl, '../assets/textures/noisemed256.png');
+                        gl.activeTexture(gl.TEXTURE0);
+                        gl.bindTexture(gl.TEXTURE_2D, texture);
+                        gl.uniform1i(location, 0);
                         break;
                 }
             });
         }
+        console.log(uniforms);
         return uniforms;
     }
 
@@ -76,5 +88,32 @@ export default class ShaderUtils {
 
     public static loadJSON(jsonLocation: string): any {
         return JSON.parse(this.loadShaderSource(jsonLocation));
+    }
+
+    public static loadTexture(gl: WebGL2RenderingContext, url: string): WebGLTexture{
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+
+        const level = 0;
+        const internalFormat = gl.RGBA;
+        const width = 1;
+        const height = 1;
+        const border = 0;
+        const srcFormat = gl.RGBA;
+        const srcType = gl.UNSIGNED_BYTE;
+        const pixel = new Uint8Array([0, 0, 255, 255]);
+        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, border, srcFormat, srcType, pixel);
+
+        const image = new Image();
+        image.onload = () => {
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        };
+
+        image.src = url;
+        return texture;
     }
 }

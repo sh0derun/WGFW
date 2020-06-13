@@ -5,14 +5,14 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
 
   public fps: number;
 
   ngOnInit() {
   }
 
-  public getFps(event){
+  public getFps(event) {
     this.fps = event;
   }
 

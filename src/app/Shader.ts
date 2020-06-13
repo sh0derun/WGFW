@@ -1,3 +1,4 @@
+import { Shape } from './models/shape';
 import ShaderUtils from './ShaderUtils';
 import { Uniform } from './models/uniform';
 
@@ -12,9 +13,9 @@ export class Shader {
     shaderUniforms: {[key: string]: Uniform};
     attributs: any;
 
-    constructor(vertexSource: string, fragmentSource: string) {
+    constructor(vertexSource: string, fragmentSource: string, usingJustLoad: boolean) {
         this.vertexShaderSource = ShaderUtils.loadShaderSource(vertexSource);
-        this.fragShaderSource = ShaderUtils.combineShader(fragmentSource);
+        this.fragShaderSource = usingJustLoad ? ShaderUtils.loadShaderSource(fragmentSource) : ShaderUtils.combineShader(fragmentSource);
         this.vertexShader = null;
         this.fragmentShader = null;
         this.programShader = null;
@@ -48,16 +49,16 @@ export class Shader {
         gl.attachShader(this.programShader, this.vertexShader);
         gl.attachShader(this.programShader, this.fragmentShader);
         gl.linkProgram(this.programShader);
+        gl.validateProgram(this.programShader);
 
-        gl.deleteShader(this.vertexShader);
-        gl.deleteShader(this.fragmentShader);
+        //gl.deleteShader(this.vertexShader);
+        //gl.deleteShader(this.fragmentShader);
 
         if (!gl.getProgramParameter(this.programShader, gl.LINK_STATUS)) {
             console.error('WebGL - Shader Initialization Error');
             gl.deleteProgram(this.programShader);
             return;
         }
-        gl.useProgram(this.programShader);
     }
 
     public initShaderValues(gl: WebGL2RenderingContext, canvas: HTMLCanvasElement) {
@@ -67,6 +68,22 @@ export class Shader {
             location: gl.getAttribLocation(this.programShader, 'a_position'),
             value: 2
         };
+        console.log(this.attributs);
+    }
+
+    public draw(gl: WebGL2RenderingContext, shape: Shape) {
+        gl.useProgram(this.programShader);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, shape.vertexBuffer);
+        gl.enableVertexAttribArray(this.attributs.a_position.location);
+        gl.vertexAttribPointer(this.attributs.a_position.location, 3, gl.FLOAT, false, 4 * 6, 0);
+        //gl.enableVertexAttribArray(this.attributs.a_color.location);
+        //gl.vertexAttribPointer(this.attributs.a_color.location, 3, gl.FLOAT, false, 4 * 6, 4 * 3);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.indexBuffer);
+        gl.drawElements(gl.TRIANGLES, shape.size, gl.UNSIGNED_SHORT, 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     }
 
 }

@@ -12,10 +12,20 @@ uniform vec2 mouse;
 uniform bool phongShading;
 uniform bool pbrShading;
 
+uniform sampler2D noisetex;
+
 struct TextureData {
   float thickness;
   float frequency;
   float amplitude;
 };
 
+struct Ao {
+  bool enabled;
+  int depth;
+};
+
 uniform TextureData textureData;
+uniform Ao uao;
+
+//sampler2D textures[1] = sampler2D[](noisetex);

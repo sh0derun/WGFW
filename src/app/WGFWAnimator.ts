@@ -1,3 +1,4 @@
+import { Shape } from './models/shape';
 import { Shader } from './Shader';
 import { GUI } from 'dat.gui';
 import ShaderUtils from './ShaderUtils';
@@ -11,6 +12,13 @@ export class WGFWAnimator {
     fpstime: number;
     gl: WebGL2RenderingContext;
     shader: Shader;
+    copyShader: Shader;
+    textureCopyShader: WebGLUniformLocation;
+    fbo: WebGLFramebuffer;
+    depthBuffer: WebGLRenderbuffer;
+    renderTexture: WebGLTexture;
+    sphereTracingQuad: Shape;
+    fullScreenQuad: Shape;
     canvas: HTMLCanvasElement;
     timeliner: WGFWTimeliner;
 
@@ -21,40 +29,30 @@ export class WGFWAnimator {
     cameraFolder: GUI;
     sphereFolder: GUI;
     fogFolder: GUI;
+    aoFolder: GUI;
+    aoData: any;
 
-    constructor(gl: WebGL2RenderingContext, shader: Shader, canvas: HTMLCanvasElement) {
+    constructor(gl: WebGL2RenderingContext, shader: Shader, fbo: WebGLFramebuffer, depthBuffer: WebGLRenderbuffer,
+                renderTexture: WebGLTexture, sphereTracingQuad: Shape, fullScreenQuad: Shape, canvas: HTMLCanvasElement) {
         this.start = 0.0;
         this.fps = 0;
         this.fpstime = 0.0;
         this.gl = gl;
         this.shader = shader;
+        this.copyShader = new Shader('../assets/shaders/vertexTexCoordVs.glsl', '../assets/shaders/copyFs.glsl', true);
+        this.copyShader.compileShaders(this.gl);
+        this.copyShader.initProgramShader(this.gl);
+        this.textureCopyShader = this.gl.getUniformLocation(this.copyShader.programShader, 'textures');
+        this.fbo = fbo;
+        this.depthBuffer = depthBuffer;
+        this.renderTexture = renderTexture;
+        this.sphereTracingQuad = sphereTracingQuad;
+        this.fullScreenQuad = fullScreenQuad;
         this.canvas = canvas;
 
         this.timeliner = new WGFWTimeliner(this.gl, this.shader);
 
-        this.guiData = {
-            fps: '0',
-            speed: 0.1,
-            fogAmount: 0.0,
-            fogColor: [0.1, 0, 0],
-            mouse: [0.0, 0.0, 0.0],
-            gamma: 1.5,
-            sphere: {metalic: 0.5, roughness: 0.5, reflectionOpacity: 1.0},
-            overRelaxation: false,
-            showDisplacements: false,
-            phongShading: true,
-            pbrShading: false,
-            pause: false,
-            camera: {x: 4.0, y: 2.0, z: 4.0},
-            save: this.saveCanvasFile.bind(this),
-            record: this.getRecordedAnimation.bind(this)
-        };
-
-        this.textureData = {
-            thickness: 0.1,
-            frequency: 0.3,
-            amplitude: 0.3
-        };
+        this.initGuiData();
 
         this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
 
@@ -90,10 +88,47 @@ export class WGFWAnimator {
         this.fogFolder.add(this.guiData, 'showDisplacements');
         this.fogFolder.add(this.guiData, 'phongShading');
         this.fogFolder.add(this.guiData, 'pbrShading');
+        this.fogFolder.add(this.guiData, 'bloom');
+
+        this.aoFolder = this.fogFolder.addFolder('Ambient Occlusion');
+        this.aoFolder.add(this.aoData, 'active');
+        this.aoFolder.add(this.aoData, 'depth', 1, 6, 1);
 
         this.guiControls.add(this.guiData, 'pause').onChange(this.onChangePauseFlag.bind(this));
         this.guiControls.add(this.guiData, 'save');
         this.guiControls.add(this.guiData, 'record');
+    }
+
+    private initGuiData(): void{
+        this.guiData = {
+            fps: '0',
+            speed: 0.1,
+            fogAmount: 0.0,
+            fogColor: [0.1, 0, 0],
+            mouse: [0.0, 0.0, 0.0],
+            gamma: 1.5,
+            sphere: {metalic: 0.5, roughness: 0.5, reflectionOpacity: 1.0},
+            overRelaxation: false,
+            showDisplacements: false,
+            phongShading: true,
+            pbrShading: false,
+            bloom: false,
+            pause: false,
+            camera: {x: 4.0, y: 2.0, z: 4.0},
+            save: this.saveCanvasFile.bind(this),
+            record: this.getRecordedAnimation.bind(this)
+        };
+
+        this.textureData = {
+            thickness: 0.1,
+            frequency: 0.3,
+            amplitude: 0.3
+        };
+
+        this.aoData = {
+            active: false,
+            depth: 1,
+        };
     }
 
     private onChangePauseFlag(): void {
@@ -184,7 +219,7 @@ export class WGFWAnimator {
 
     private updateUniformsValues(/*elapsedTime: number*/): void {
         this.shader.shaderUniforms.time.value = <number> this.shader.shaderUniforms.time.value + 0.01;
-        this.shader.shaderUniforms.speed.value = this.lerp(<number> this.shader.shaderUniforms.speed.value, this.guiData.speed, 1.0);
+        this.shader.shaderUniforms.speed.value = this.lerp(<number> this.shader.shaderUniforms.speed.value, this.guiData.speed, 0.9);
         this.shader.shaderUniforms.fogAmount.value = this.lerp(<number> this.shader.shaderUniforms.fogAmount.value, this.guiData.fogAmount, 1.0);
         this.shader.shaderUniforms.gamma.value = this.lerp(<number> this.shader.shaderUniforms.gamma.value, this.guiData.gamma, 0.5);
         this.shader.shaderUniforms.overRelaxation.value = +this.guiData.overRelaxation;
@@ -198,6 +233,32 @@ export class WGFWAnimator {
         for (let i = 0; i < (<number[]> this.shader.shaderUniforms.textureData.value).length; i++) {
             this.shader.shaderUniforms.textureData.value[i] = this.lerp(this.shader.shaderUniforms.textureData.value[i], texdata[i], this.shader.shaderUniforms.textureData.lerp[i]);
         }
+
+        const aodata: number[] = Object.values(this.aoData);
+        for (let i = 0; i < (<number[]> this.shader.shaderUniforms.uao.value).length; i++) {
+            if (this.shader.shaderUniforms.uao.types[i] === ShaderUtils.UNIFORM_TYPES.BOOL) {
+                this.shader.shaderUniforms.uao.value[i] = +aodata[i];
+            } else if (this.shader.shaderUniforms.uao.types[i] === ShaderUtils.UNIFORM_TYPES.INT) {
+                this.shader.shaderUniforms.uao.value[i] = aodata[i];
+            }
+        }
+    }
+
+    private drawFullScreenQuad(gl: WebGL2RenderingContext, program: WebGLProgram): void {
+        const shape: Shape = this.fullScreenQuad;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, shape.vertexBuffer);
+        const vertPosition = gl.getAttribLocation(program, 'vert_position');
+        gl.enableVertexAttribArray(vertPosition);
+        gl.vertexAttribPointer(vertPosition, 3, gl.FLOAT, false, 4 * 5, 0);
+        const vertTexCoord = gl.getAttribLocation(program, 'vert_texCoord');
+        gl.enableVertexAttribArray(vertTexCoord);
+        gl.vertexAttribPointer(vertTexCoord, 2, gl.FLOAT, false, 4 * 5, 4 * 3);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.indexBuffer);
+        gl.drawElements(gl.TRIANGLES, shape.size, gl.UNSIGNED_SHORT, 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     }
 
     public render(): void {
@@ -205,31 +266,60 @@ export class WGFWAnimator {
             const elapsedtime: number = (performance.now() - this.start) / 1000.0;
             this.fps = this.lerp(this.fps, 1 / elapsedtime, 0.1);
             this.guiData.fps = this.fps;
-            this.updateUniformsValues(/*elapsedtime*/);
 
-            Object.values(this.shader.shaderUniforms).forEach(uniform => {
-                switch (uniform.type) {
-                    case ShaderUtils.UNIFORM_TYPES.FLOAT:
-                        this.gl.uniform1f(uniform.location, <number> uniform.value);
-                        break;
-                    case ShaderUtils.UNIFORM_TYPES.VEC2:
-                        this.gl.uniform2fv(uniform.location, <number[]> uniform.value);
-                        break;
-                    case ShaderUtils.UNIFORM_TYPES.VEC3:
-                        this.gl.uniform3fv(uniform.location, <number[]> uniform.value);
-                        break;
-                    case ShaderUtils.UNIFORM_TYPES.STRUCT:
-                        for (let i = 0; i < (<number[]> uniform.value).length; i++) {
-                            this.gl.uniform1f(uniform.location[i], uniform.value[i]);
-                        }
-                        break;
-                    case ShaderUtils.UNIFORM_TYPES.BOOL:
-                        this.gl.uniform1f(uniform.location, <number> uniform.value);
-                        break;
-                }
-            });
+            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
+            this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.renderTexture, 0);
 
-            this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+            {
+                this.shader.draw(this.gl, this.sphereTracingQuad);
+
+                this.updateUniformsValues(/*elapsedtime*/);
+
+                Object.values(this.shader.shaderUniforms).forEach(uniform => {
+                    switch (uniform.type) {
+                        case ShaderUtils.UNIFORM_TYPES.FLOAT:
+                            this.gl.uniform1f(uniform.location, <number> uniform.value);
+                            break;
+                        case ShaderUtils.UNIFORM_TYPES.VEC2:
+                            this.gl.uniform2fv(uniform.location, <number[]> uniform.value);
+                            break;
+                        case ShaderUtils.UNIFORM_TYPES.VEC3:
+                            this.gl.uniform3fv(uniform.location, <number[]> uniform.value);
+                            break;
+                        case ShaderUtils.UNIFORM_TYPES.STRUCT:
+                            for (let i = 0; i < (<number[]> uniform.value).length; i++) {
+                                if (uniform.types[i] === ShaderUtils.UNIFORM_TYPES.INT) {
+                                    this.gl.uniform1i(uniform.location[i], uniform.value[i]);
+                                } else if (uniform.types[i] === ShaderUtils.UNIFORM_TYPES.FLOAT) {
+                                    this.gl.uniform1f(uniform.location[i], uniform.value[i]);
+                                } else if (uniform.types[i] === ShaderUtils.UNIFORM_TYPES.BOOL) {
+                                    this.gl.uniform1f(uniform.location[i], uniform.value[i]);
+                                }
+                            }
+                            break;
+                        case ShaderUtils.UNIFORM_TYPES.BOOL:
+                            this.gl.uniform1f(uniform.location, +uniform.value);
+                            break;
+                    }
+                });
+
+                this.gl.useProgram(null);
+
+                this.gl.flush();
+            }
+
+            this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, null, 0);
+            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
+            this.gl.useProgram(this.copyShader.programShader);
+            if (this.textureCopyShader != null) {
+                this.gl.activeTexture(this.gl.TEXTURE1);
+                this.gl.bindTexture(this.gl.TEXTURE_2D, this.renderTexture);
+                this.gl.uniform1i(this.textureCopyShader, 1);
+                this.gl.uniform1f(this.gl.getUniformLocation(this.copyShader.programShader, 'bloom'), +this.guiData.bloom);
+            }
+            this.drawFullScreenQuad(this.gl, this.copyShader.programShader);
+            this.gl.useProgram(null);
 
             this.start = performance.now();
 
