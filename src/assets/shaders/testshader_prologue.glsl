@@ -55,19 +55,24 @@ vec2 opBlend(vec2 d1, vec2 d2){
     return vec2(d, m);
 }
 
-SdfPhongResult sdf(vec3 p, vec2 uv){
-    vec3 q = p;
-    q -= vec3(0.0,1.0,0.0);
-    float ns = noise(q.xz*1.5) * 1.049;
-    //float freq = 9.0;
-    //float f = 3.0*smoothstep(0.0,4.0,pow(ns*-1.5*sin(freq*q.x)*sin(q.y*freq)*sin(q.z*freq),2.0));
-    /*SdfPhongResult sphere = SdfPhongResult((max(abs(sp(q, 2.0))-0.07,
-                                           dot(q, normalize(vec3(0.0,-1.0,0.0)))+ns*mix(0.0,1.0,smoothstep(-1.0,0.61,sin(q.z*2.0)*sin(q.x*2.0)*0.43)))-(0.02*f)) * 0.6, 
-                                           mixMaterial(gold, ruby, nsm));*/
-    SdfPhongResult sphere = SdfPhongResult(sp(q, 2.0), mixMaterial(gold, ruby, ns));
+void animate(inout vec3 p){
+    
+}
 
-    sphere.m.shininess *= 200.0;
-    return sphere;
+SdfPhongResult sdfPhong(vec3 p, vec2 uv){
+    SdfPhongResult s = SdfPhongResult(sp(p, 1.0), emerald);
+    SdfPhongResult s1 = SdfPhongResult(sp(p + vec3(2.5,0.0,0.0), 1.0), ruby);
+    SdfPhongResult s2 = SdfPhongResult(sp(p - vec3(2.5,0.0,0.0), 1.0), bronze);
+    s.m.shininess *= 300.0;
+    s.m.reflective = true;
+    s.m.reflectance = speed;
+    s1.m.shininess *= 300.0;
+    s2.m.shininess *= 300.0;
+    return minop(s,minop(s1,s2));
+}
+
+SdfPbrResult sdfPBR(vec3 p, vec2 uv){
+    return SdfPbrResult(sp(p, 1.0), simpleMatRed);
 }
 
 vec3 triplanarMap(vec3 surfacePos, vec3 normal, sampler2D tex, float scale){
@@ -79,13 +84,13 @@ vec3 triplanarMap(vec3 surfacePos, vec3 normal, sampler2D tex, float scale){
     return triMapSamples * abs(normal);
 }
 
-SdfPhongResult march(vec3 ro, vec3 rd, vec2 uv, int maxIteration){
+SdfPhongResult marchPhong(vec3 ro, vec3 rd, vec2 uv, int maxIteration){
     SdfPhongResult t = SdfPhongResult(0.0, silver);
     float iter = 0.0;
     for(int i = 0; i < maxIteration; i++){
         iter = float(i)/float(maxIteration);
     	vec3 p = ro + t.d*rd;
-        SdfPhongResult d = sdf(p, uv);
+        SdfPhongResult d = sdfPhong(p, uv);
         t.d += d.d;
         t.m = d.m;
         if(t.d > MAX_DIST || abs(d.d) < (0.001*t.d)) break;
@@ -94,11 +99,41 @@ SdfPhongResult march(vec3 ro, vec3 rd, vec2 uv, int maxIteration){
     return t;
 }
 
-vec3 normal(vec3 p){
+SdfPbrResult marchPBR(vec3 ro, vec3 rd, vec2 uv, int maxIteration){
+    SdfPbrResult t = SdfPbrResult(0.0, simpleMatWhite);
+    float iter = 0.0;
+    for(int i = 0; i < maxIteration; i++){
+        iter = float(i)/float(maxIteration);
+    	vec3 p = ro + t.d*rd;
+        SdfPbrResult d = sdfPBR(p, uv);
+        t.d += d.d;
+        t.m = d.m;
+        if(t.d > MAX_DIST || abs(d.d) < (0.001*t.d)) break;
+        //if(d.x < 0.001) break;
+    }
+    return t;
+}
+
+/*vec3 normalPhong(vec3 p){
     vec2 e = vec2(0.0001, 0.0);
-    float dx = sdf(p+e.xyy,e).d-sdf(p-e.xyy,e).d;
-    float dy = sdf(p+e.yxy,e).d-sdf(p-e.yxy,e).d;
-    float dz = sdf(p+e.yyx,e).d-sdf(p-e.yyx,e).d;
+    float dx = sdfPhong(p+e.xyy,e).d-sdfPhong(p-e.xyy,e).d;
+    float dy = sdfPhong(p+e.yxy,e).d-sdfPhong(p-e.yxy,e).d;
+    float dz = sdfPhong(p+e.yyx,e).d-sdfPhong(p-e.yyx,e).d;
+    return normalize(vec3(dx,dy,dz));
+}*/
+
+vec3 normalPhong(vec3 p){
+    vec2 e = vec2(0.01, 0.0);
+    float d = sdfPhong(p ,e).d;
+    vec3 n = d - vec3(sdfPhong(p - e.xyy ,e).d,sdfPhong(p - e.yxy ,e).d,sdfPhong(p - e.yyx ,e).d);
+    return normalize(n);
+}
+
+vec3 normalPBR(vec3 p){
+    vec2 e = vec2(0.0001, 0.0);
+    float dx = sdfPBR(p+e.xyy,e).d-sdfPBR(p-e.xyy,e).d;
+    float dy = sdfPBR(p+e.yxy,e).d-sdfPBR(p-e.yxy,e).d;
+    float dz = sdfPBR(p+e.yyx,e).d-sdfPBR(p-e.yyx,e).d;
     return normalize(vec3(dx,dy,dz));
 }
 
@@ -144,7 +179,7 @@ float calcAO( in vec3 pos, in vec3 nor ){
     float sca = 1.0;
     for( int i=0; i<uao.depth; i++ ){
         vec3 aopos =  nor * (0.2*float(i)/4.0) + pos;
-        float dd = sdf( aopos , aopos.xy).d;
+        float dd = sdfPhong( aopos , aopos.xy).d;
         occ += -(dd-(0.2*float(i)/4.0))*sca;
         sca *= 0.95;
     }

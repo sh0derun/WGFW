@@ -1,3 +1,4 @@
+import { ContextStore } from './store/context.store';
 import { Shape } from './models/shape';
 import { Shader } from './Shader';
 import { GUI } from 'dat.gui';
@@ -99,7 +100,7 @@ export class WGFWAnimator {
         this.guiControls.add(this.guiData, 'record');
     }
 
-    private initGuiData(): void{
+    private initGuiData(): void {
         this.guiData = {
             fps: '0',
             speed: 0.1,
@@ -218,7 +219,8 @@ export class WGFWAnimator {
     }
 
     private updateUniformsValues(elapsedTime: number): void {
-        this.shader.shaderUniforms.time.value = <number> this.shader.shaderUniforms.time.value + elapsedTime;
+        console.log(elapsedTime);
+        this.shader.shaderUniforms.time.value = <number>this.shader.shaderUniforms.time.value + 0.01;
         this.shader.shaderUniforms.speed.value = this.lerp(<number> this.shader.shaderUniforms.speed.value, this.guiData.speed, 0.9);
         this.shader.shaderUniforms.fogAmount.value = this.lerp(<number> this.shader.shaderUniforms.fogAmount.value, this.guiData.fogAmount, 1.0);
         this.shader.shaderUniforms.gamma.value = this.lerp(<number> this.shader.shaderUniforms.gamma.value, this.guiData.gamma, 0.5);
@@ -242,6 +244,8 @@ export class WGFWAnimator {
                 this.shader.shaderUniforms.uao.value[i] = aodata[i];
             }
         }
+
+        this.timeliner.pause = this.guiData.pause;
     }
 
     private drawFullScreenQuad(gl: WebGL2RenderingContext, program: WebGLProgram): void {

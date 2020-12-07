@@ -18,11 +18,11 @@ void main() {
     if(bloom){
         for(int y = 0; y < kernelSize; y++){
             for(int x = 0; x < kernelSize; x++){
-                vec2 offset = vec2(ivec2(x,y)-ivec2(kernelSize/2))/vec2(600.0);
+                vec2 offset = vec2(ivec2(x,y)-ivec2(kernelSize/2))/vec2(200.0);
                 acc += texture(textures, geom_texCoord + offset).xyz * (1.0 / float(kernelSize*kernelSize));
             }
         }
     }
-    //acc = saturate(pow(acc + 0.03, vec3(4.4))*10.0);
+    //acc = saturate(pow(acc + 0.03, vec3(4.4)));
     outColor = vec4(clean + acc, 1.0);
 }

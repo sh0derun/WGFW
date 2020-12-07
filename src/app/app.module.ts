@@ -1,3 +1,4 @@
+import { ContextStore } from './store/context.store';
 import { Shader } from './Shader';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -14,6 +15,7 @@ import { WgfwDirective } from './directives/wgfw.directive';
       BrowserModule
    ],
    providers: [
+      ContextStore
    ],
    bootstrap: [
       AppComponent

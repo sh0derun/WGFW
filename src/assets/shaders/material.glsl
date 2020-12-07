@@ -135,3 +135,11 @@ Material mixMaterial(Material a, Material b, float x, bool isReflecting){
 			 isReflecting,
 			 mix(a.reflectance, b.reflectance, x));
 }
+
+SdfPhongResult minop(SdfPhongResult a, SdfPhongResult b){
+	if(a.d < b.d) return a; else return b;
+}
+
+SdfPbrResult minop(SdfPbrResult a, SdfPbrResult b){
+	if(a.d < b.d) return a; else return b;
+}
