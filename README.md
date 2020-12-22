@@ -26,6 +26,8 @@ Those are some resources in which i spent time to implement all 3d computer grap
 ## Screneshots:
 those are some screenshots of some running demos:
 
+![wgfw0](images/virusshader.gif)
+
 ![wgfw1](images/wgfw1.PNG)
 
 ![wgfw2](images/wgfw2.PNG)
